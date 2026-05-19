@@ -193,7 +193,7 @@
     <button class="tb" id="t-fork" type="button" aria-pressed="false" aria-label="Fork tool (key 2)"><span aria-hidden="true">🍴</span><span class="tl">Fork</span></button>
   </div>
 
-  <div id="ghint">📱 Move phone to look · Pinch to approach · Walk closer</div>
+  <div id="ghint">📱 Move phone to look · 🚶 Walk toward the cookie</div>
   <div id="dhelp">
     <kbd>Drag</kbd> Pan camera<br>
     <kbd>Scroll</kbd> Approach / retreat<br>
@@ -242,7 +242,7 @@ import * as THREE from 'three';
     defaultSeed: 42,
     defaultRadius: 150,
     pan: { touchSensitivity: 0.005, mouseSensitivity: 0.003, smoothing: 0.12 },
-    approach: { wheelStep: 0.001, keyStep: 0.04, pinchScale: 0.02, stepReduction: 0.05 },
+    approach: { wheelStep: 0.001, keyStep: 0.04, stepReduction: 0.05, facingConeRad: 25 * Math.PI / 180 },
     step: { accelThreshold: 3.5, minIntervalMs: 350, sampleWindow: 20 },
     damage: { knife: 0.15, fork: 0.10 },
     inRangeDist: 2.5,
@@ -287,8 +287,10 @@ import * as THREE from 'three';
     swipe: { on:false, source:null, pts:[], head:0 },   // ring buffer; source = 'mouse' | 'touch'
     cookie: null,
     yaw: 0, pitch: 0, approach: 1.0,
-    pinchD: 0, pinchOn: false,
-    paused: false,                  // set true when out-of-bounds; blocks gameplay input + damage
+    facingCookie: false,            // true when cam-forward is within CONFIG.approach.facingConeRad of cookie
+    outOfBounds: false,             // GPS-driven: player is outside the zone radius
+    betweenCatches: false,          // post-catch teardown -> pre-spawn pause
+    get paused(){ return this.outOfBounds || this.betweenCatches },
     gameOver: false,
     runId: 0,                       // monotonic; used for spawn seeding so positions don't repeat on restart
   };
@@ -365,17 +367,17 @@ import * as THREE from 'three';
         if (d > ZONE.radius){
           els.oob.classList.add('show');
           els.oobDist.textContent = `${Math.round(d - ZONE.radius)}m outside`;
-          S.paused = true;
+          S.outOfBounds = true;
         } else {
           els.oob.classList.remove('show');
-          S.paused = false;
+          S.outOfBounds = false;
         }
       }
     }, err => devLog('geolocation watch error', err), { enableHighAccuracy:true, maximumAge:5000, timeout:10000 });
   }
   els.oobDismiss.addEventListener('click', ()=>{
     els.oob.classList.remove('show');
-    S.paused = false;
+    S.outOfBounds = false;
     showToast('Continuing in dev mode');
   });
 
@@ -533,7 +535,10 @@ import * as THREE from 'three';
     const sr = mulberry32(ZONE.seed + S.caught*137 + S.runId*8191);
     const yaw   = (sr() - 0.5) * Math.PI * 1.2;
     const pitch = (sr() - 0.5) * 0.5;
-    const dist  = 3 + sr() * 3;
+    // Varied initial distance so close cookies feel close and far ones require walking.
+    // Range ~2..8 world units; inRangeDist is 2.5, so the closest cookies are nearly
+    // in-range immediately, the farthest require several steps.
+    const dist  = 2 + sr() * 6;
 
     const px = Math.sin(yaw)*Math.cos(pitch)*dist;
     const py = Math.sin(pitch)*dist*0.3;
@@ -546,6 +551,8 @@ import * as THREE from 'three';
 
     S.cookie = { yaw, pitch, dist, origin: new THREE.Vector3(px, py, pz), health: 100, cuts: 0, scratches: 0 };
     S.approach = 1.0;
+    S.facingCookie = false;
+    S.inRange = false;
 
     scene.add(cookieGrp);
 
@@ -554,6 +561,14 @@ import * as THREE from 'three';
     scene.add(dofBlurSphere);
 
     els.cookieHp.classList.remove('show');
+    els.hpFill.style.width = '0%';
+
+    // Re-enable gameplay only after the new cookie is fully wired into the scene.
+    // This closes the race where a continuing swipe from the previous catch could
+    // damage (or even re-catch) the fresh cookie in the frame before the loop
+    // recomputes S.inRange. OOB pause is independent — handled by the GPS watcher.
+    S.betweenCatches = false;
+
     updateHUD();
   }
 
@@ -765,31 +780,15 @@ import * as THREE from 'three';
     els.interact.addEventListener('touchend', e=>{ if (e.touches.length === 0) drag = null });
   }
 
-  // ═══════════════════════════════════════
-  //  PINCH-TO-APPROACH
-  // ═══════════════════════════════════════
-  els.interact.addEventListener('touchstart', e=>{
-    if (e.touches.length === 2 && !S.paused){
-      S.pinchOn = true;
-      S.pinchD = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-      // Cancel any active single-touch swipe so gestures don't fight
-      if (S.swipe.on){ S.swipe.on = false; swipeClear(); sCtx.clearRect(0,0,els.swipeCv.width,els.swipeCv.height) }
-    }
-  }, { passive:true });
-  els.interact.addEventListener('touchmove', e=>{
-    if (S.pinchOn && e.touches.length === 2){
-      const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-      S.approach = Math.max(0, Math.min(1, S.approach - (d/S.pinchD - 1) * CONFIG.approach.pinchScale));
-      S.pinchD = d;
-    }
-  }, { passive:true });
-  els.interact.addEventListener('touchend', e=>{ if (e.touches.length < 2) S.pinchOn = false }, { passive:true });
+  // (Pinch-to-approach removed — depth is AR-driven: walk toward the cookie.)
 
   stepper.onStep = ()=>{
-    if (S.cookie && !S.inRange && !S.paused){
-      S.approach = Math.max(0, S.approach - CONFIG.approach.stepReduction);
-      if (navigator.vibrate) navigator.vibrate(CONFIG.vibration.step);
-    }
+    if (!S.cookie || S.inRange || S.paused) return;
+    // Direction-aware: only count steps when the player is aimed at the cookie.
+    // S.facingCookie is updated in the main loop using cam.quaternion + cookie pos.
+    if (!S.facingCookie) return;
+    S.approach = Math.max(0, S.approach - CONFIG.approach.stepReduction);
+    if (navigator.vibrate) navigator.vibrate(CONFIG.vibration.step);
   };
 
   // ═══════════════════════════════════════
@@ -797,6 +796,7 @@ import * as THREE from 'three';
   // ═══════════════════════════════════════
   function applyDamage(pt){
     if (S.paused || !S.inRange || !S.cookie || !cookieGrp) return;
+    if (S.cookie.health <= 0) return;     // defense-in-depth: never re-catch a dead cookie
     const [prev, last] = swipeLastTwo();
     const ref = prev || last;
     const spd = ref ? Math.hypot(pt.x - ref.x, pt.y - ref.y) : 0;
@@ -838,8 +838,10 @@ import * as THREE from 'three';
     }
   });
   els.interact.addEventListener('contextmenu', e=> e.preventDefault());
+  // Wheel and W/S keys are dev-mode shortcuts: they bypass the AR walk requirement,
+  // so gate them on desktop / dev so a Bluetooth keyboard on a phone can't cheat.
   els.interact.addEventListener('wheel', e=>{
-    if (S.paused) return;
+    if (S.paused || !(isDesktop || devMode)) return;
     e.preventDefault();      // intentional: #interact is full-viewport so we own scroll while playing
     S.approach = Math.max(0, Math.min(1, S.approach + e.deltaY * CONFIG.approach.wheelStep));
   }, { passive:false });
@@ -847,9 +849,9 @@ import * as THREE from 'three';
   window.addEventListener('keydown', e=>{
     if (e.key === '1') selTool('knife');
     else if (e.key === '2') selTool('fork');
-    else if (e.key === 'w' || e.key === 'W') S.approach = Math.max(0, S.approach - CONFIG.approach.keyStep);
-    else if (e.key === 's' || e.key === 'S') S.approach = Math.min(1, S.approach + CONFIG.approach.keyStep);
     else if (e.key === 'Escape'){ S.tool = null; setToolActive(null) }
+    else if ((e.key === 'w' || e.key === 'W') && (isDesktop || devMode)) S.approach = Math.max(0, S.approach - CONFIG.approach.keyStep);
+    else if ((e.key === 's' || e.key === 'S') && (isDesktop || devMode)) S.approach = Math.min(1, S.approach + CONFIG.approach.keyStep);
   });
 
   // ═══════════════════════════════════════
@@ -959,7 +961,18 @@ import * as THREE from 'three';
     S.score += pr.pts;
     saveProgress();
     if (navigator.vibrate) navigator.vibrate(CONFIG.vibration.catch);
+
+    // Atomic teardown — every piece of state that could let a continuing swipe
+    // hit the next cookie (or this one's corpse) is cleared in one place.
+    S.cookie = null;
+    S.inRange = false;
+    S.facingCookie = false;
+    S.swipe.on = false; swipeClear();
+    S.betweenCatches = true;                    // re-enabled inside the next spawnCookie()
+    S.tool = null; setToolActive(null);         // force re-pick for the next cookie
     els.cookieHp.classList.remove('show');
+    els.hpFill.style.width = '0%';              // snap so the next bar doesn't flash from 0->95
+
     if (cookieGrp){
       const es = performance.now();
       const grp = cookieGrp;       // capture so the loop doesn't see a reassigned variable
@@ -1051,6 +1064,14 @@ import * as THREE from 'three';
       const onScreen = Math.abs(proj.x) < 0.7 && Math.abs(proj.y) < 0.7 && proj.z < 1 && proj.z > 0;
       const dist3d = cam.position.distanceTo(cookieGrp.position);
 
+      // Facing test: angle between cam-forward and direction-to-cookie. Used by the
+      // step detector to gate approach so only walking *toward* the cookie counts.
+      // Reuse _scratchDir (already normalized to cookie direction) — cam forward in
+      // world space is (0,0,-1) rotated by cam quaternion.
+      _scratchV.set(0, 0, -1).applyQuaternion(cam.quaternion);
+      const facingDot = _scratchV.dot(_scratchDir);    // _scratchDir = cookie dir from origin (cam at origin)
+      S.facingCookie = facingDot > Math.cos(CONFIG.approach.facingConeRad);
+
       S.inRange = onScreen && dist3d < CONFIG.inRangeDist && !S.paused;
       els.xhair.classList.toggle('near', S.inRange);
 
@@ -1090,7 +1111,17 @@ import * as THREE from 'three';
         els.darrow.classList.remove('show');
       }
 
-      els.radar.classList.toggle('hidden', onScreen);
+      // Radar: hide entirely when the cookie is on-screen AND in range (player is
+      // looking at it). Otherwise fade with approach — feels far when far, urgent
+      // when close. Keeps "you're getting warmer" feedback even after you've
+      // turned to face the cookie.
+      if (S.inRange){
+        els.radar.style.opacity = '0';
+        els.radar.classList.add('hidden');
+      } else {
+        els.radar.classList.remove('hidden');
+        els.radar.style.opacity = String(Math.max(0.15, Math.min(0.9, 0.15 + S.approach * 0.6)));
+      }
 
       const pct = Math.max(0, Math.min(100, (1 - S.approach) * 100));
       els.dfill.style.height = pct + '%';
@@ -1171,7 +1202,7 @@ import * as THREE from 'three';
   // ─── iOS gesture & lifecycle ───────────────────────────────────────────
   // iOS 13+ ignores user-scalable=no for accessibility, so a two-finger pinch
   // can still zoom the whole page. Block the non-standard 'gesture*' events
-  // (iOS-only) to keep our in-game pinch from also zooming Safari.
+  // (iOS-only) so accidental two-finger touches during gameplay don't zoom Safari.
   ['gesturestart','gesturechange','gestureend'].forEach(name => {
     document.addEventListener(name, ev => ev.preventDefault(), { passive:false });
   });

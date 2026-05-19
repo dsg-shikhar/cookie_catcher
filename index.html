@@ -214,16 +214,23 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <!--
-  SECURITY: Three.js is loaded from a CDN. Add an `integrity="sha384-..."` attribute
-  to the <script> tag below to enable SRI. The hash for cdnjs r128 can be computed via:
-    curl -fsSL https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js \
+  SECURITY: Three.js is loaded from jsdelivr as an ES module via importmap.
+  To enable Subresource Integrity, generate the hash and add `integrity="sha384-..."`
+  to the importmap entry (importmap doesn't accept integrity directly — instead pin
+  via a Service Worker or self-host). Recipe:
+    curl -fsSL https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js \
       | openssl dgst -sha384 -binary | openssl base64 -A
-  The build sandbox here can't reach the CDN, so the attribute is left as a TODO.
-  Ideally, migrate to a pinned modern release (r160+) loaded via <script type="module">
-  + importmap so security/perf fixes from the last 5 years are picked up.
+  Sandboxed build envs can't reach the CDN, so the hash is left as a TODO.
 -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous"></script>
-<script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
 (()=>{
   'use strict';
 
@@ -405,6 +412,14 @@
   let scene, cam, renderer, cookieGrp, dofBlurSphere;
   const _scratchV = new THREE.Vector3();        // reused per-frame
   const _scratchDir = new THREE.Vector3();
+
+  // prefers-reduced-motion: gate the in-game cookie spin + bob (CSS already
+  // handles DOM animations via the global @media rule).
+  const reducedMotionMQ = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+  let reducedMotion = !!(reducedMotionMQ && reducedMotionMQ.matches);
+  if (reducedMotionMQ && reducedMotionMQ.addEventListener){
+    reducedMotionMQ.addEventListener('change', e => { reducedMotion = e.matches });
+  }
 
   function initThree(){
     scene = new THREE.Scene();
@@ -1021,13 +1036,13 @@
     cam.rotation.x += (S.pitch - cam.rotation.x) * CONFIG.pan.smoothing;
 
     if (cookieGrp && S.cookie && !S.gameOver){
-      cookieGrp.rotation.z += dt * 0.4;
+      if (!reducedMotion) cookieGrp.rotation.z += dt * 0.4;
 
       // reuse scratch vector for direction
       _scratchDir.copy(S.cookie.origin).normalize();
       const effectiveDist = 0.8 + S.approach * (S.cookie.dist - 0.8);
       _scratchV.copy(_scratchDir).multiplyScalar(effectiveDist);
-      _scratchV.y += Math.sin(t * 0.002) * 0.06;
+      if (!reducedMotion) _scratchV.y += Math.sin(t * 0.002) * 0.06;
       cookieGrp.position.lerp(_scratchV, 0.1);
 
       if (dofBlurSphere) dofBlurSphere.position.copy(cookieGrp.position);
@@ -1179,6 +1194,24 @@
   // collapsing URL bar. Fall back to innerWidth/innerHeight on older browsers.
   if (window.visualViewport){
     window.visualViewport.addEventListener('resize', onResize);
+  }
+
+  // ─── Secure-context gate ─────────────────────────────────────────────
+  // getUserMedia, DeviceMotionEvent.requestPermission, and watchPosition all
+  // require a secure context. Browsers exempt localhost / 127.0.0.1 but http://
+  // anywhere else will silently fail. Warn the user on the gate instead of
+  // having them tap Start Hunting and stare at a black screen.
+  const isLocalhost = ['localhost','127.0.0.1','[::1]'].includes(location.hostname)
+                   || location.hostname.endsWith('.localhost');
+  const isSecure = window.isSecureContext || isLocalhost;
+  if (!isSecure){
+    els.errMsg.innerHTML =
+      '⚠️ <strong>Insecure connection</strong><br>' +
+      'This game needs HTTPS to access your camera and motion sensors. ' +
+      'Open the same URL with <code>https://</code>, or host it behind TLS.';
+    els.startBtn.disabled = true;
+    els.startBtn.textContent = 'HTTPS required';
+    devLog('insecure context — camera/motion APIs will be blocked by the browser');
   }
 
   // GPS pre-flight on gate

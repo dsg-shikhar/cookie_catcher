@@ -2,16 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Cookie Catcher AR</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   :root{--gold:#F5A623;--gold-dark:#D4891A;--cream:#FFF8E7;--brown:#5C3D2E;--red:#E74C3C;--green:#2ECC71;--bg-dark:rgba(0,0,0,0.7)}
-  html,body{width:100%;height:100%;overflow:hidden;font-family:'Fredoka',sans-serif;touch-action:none;background:#000}
+  html,body{width:100%;height:100%;height:100dvh;overflow:hidden;font-family:'Fredoka',sans-serif;touch-action:none;background:#000;overscroll-behavior:none}
 
   /* Gate */
-  #gate{position:fixed;inset:0;z-index:1000;background:linear-gradient(145deg,#2C1810,#5C3D2E 50%,#8B6914);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--cream);text-align:center;padding:2rem}
+  #gate{position:fixed;inset:0;z-index:1000;background:linear-gradient(145deg,#2C1810,#5C3D2E 50%,#8B6914);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--cream);text-align:center;padding:max(2rem,env(safe-area-inset-top)) 2rem max(2rem,env(safe-area-inset-bottom));overflow-y:auto;-webkit-overflow-scrolling:touch}
+  @media (max-height:600px){#gate{justify-content:flex-start}}
   #gate.hidden{display:none}
   #gate h1{font-size:2.4rem;font-weight:700;text-shadow:0 4px 20px rgba(245,166,35,0.5);margin-bottom:0.5rem;animation:float 3s ease-in-out infinite}
   #gate .emoji{font-size:5rem;animation:spin3d 4s ease-in-out infinite;margin-bottom:1rem;filter:drop-shadow(0 10px 30px rgba(245,166,35,0.4))}
@@ -78,8 +81,8 @@
   #dlabel{position:absolute;right:1.5rem;top:50%;transform:translateY(-50%) rotate(-90deg);z-index:10;font-size:0.55rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:2px;white-space:nowrap}
 
   /* Tools */
-  #tools{position:absolute;bottom:0;left:0;right:0;z-index:10;padding:0 1rem 2rem;display:flex;justify-content:center;gap:1rem;align-items:flex-end}
-  .tb{width:72px;height:72px;border-radius:50%;border:3px solid rgba(255,255,255,0.3);background:var(--bg-dark);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;font-size:2rem;cursor:pointer;transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);position:relative}
+  #tools{position:absolute;bottom:0;left:0;right:0;z-index:10;padding:0 1rem max(2rem,env(safe-area-inset-bottom));display:flex;justify-content:center;gap:1rem;align-items:flex-end}
+  .tb{width:72px;height:72px;border-radius:50%;border:3px solid rgba(255,255,255,0.3);background:var(--bg-dark);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;font-size:2rem;cursor:pointer;transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);position:relative;-webkit-appearance:none;appearance:none;color:inherit;font-family:inherit;padding:0}
   .tb.active{border-color:var(--gold);background:rgba(245,166,35,0.25);transform:scale(1.15);box-shadow:0 0 30px rgba(245,166,35,0.4)}
   .tb:focus-visible{outline:3px solid var(--cream);outline-offset:3px}
   .tb .tl{position:absolute;bottom:-20px;font-size:0.6rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
@@ -96,7 +99,7 @@
   @keyframes hfade{0%,70%{opacity:1}100%{opacity:0}}
 
   /* Prize */
-  #prize{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.88);display:none;flex-direction:column;align-items:center;justify-content:center;color:var(--cream);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  #prize{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.88);display:none;flex-direction:column;align-items:center;justify-content:center;color:var(--cream);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:max(1rem,env(safe-area-inset-top)) 1rem max(1rem,env(safe-area-inset-bottom));overflow-y:auto;-webkit-overflow-scrolling:touch}
   #prize.show{display:flex}
   #prize .pi{font-size:6rem;animation:pbounce 0.6s cubic-bezier(0.34,1.56,0.64,1)}
   #prize h2{font-size:1.8rem;margin:1rem 0 0.5rem;color:var(--gold)}
@@ -109,10 +112,8 @@
   .toast{position:fixed;top:5rem;left:50%;transform:translateX(-50%) translateY(-20px);z-index:50;background:var(--bg-dark);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--cream);padding:0.8rem 1.5rem;border-radius:12px;font-size:0.9rem;opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;border:1px solid rgba(245,166,35,0.3)}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-  .crumb{position:absolute;pointer-events:none;z-index:20;border-radius:50%}
-
   /* OOB */
-  #oob{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.92);display:none;flex-direction:column;align-items:center;justify-content:center;color:var(--cream);text-align:center;padding:2rem}
+  #oob{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.92);display:none;flex-direction:column;align-items:center;justify-content:center;color:var(--cream);text-align:center;padding:max(2rem,env(safe-area-inset-top)) 2rem max(2rem,env(safe-area-inset-bottom));overflow-y:auto;-webkit-overflow-scrolling:touch}
   #oob.show{display:flex}
   #oob h2{font-size:1.6rem;margin-bottom:0.5rem}
   #oob p{opacity:0.7;max-width:280px;line-height:1.5;margin-bottom:1rem}
@@ -559,7 +560,11 @@
   //  SWIPE TRAIL
   // ═══════════════════════════════════════
   const sCtx = els.swipeCv.getContext('2d');
-  function resizeSwipe(){ els.swipeCv.width = innerWidth; els.swipeCv.height = innerHeight }
+  function resizeSwipe(){
+    const w = window.visualViewport ? window.visualViewport.width : innerWidth;
+    const h = window.visualViewport ? window.visualViewport.height : innerHeight;
+    els.swipeCv.width = w; els.swipeCv.height = h;
+  }
   function swipePush(x, y){
     // ring buffer over CONFIG.swipeMaxPts
     const max = CONFIG.swipeMaxPts;
@@ -590,28 +595,51 @@
   }
   function swipeClear(){ S.swipe.pts.length = 0; S.swipe.head = 0 }
 
-  function drawTrail(){
-    sCtx.clearRect(0, 0, els.swipeCv.width, els.swipeCv.height);
-    if (!S.swipe.on) return;
-    const pts = swipePts();
-    if (pts.length < 2) return;
-    sCtx.beginPath();
-    sCtx.moveTo(pts[0].x, pts[0].y);
-    for (let i=1;i<pts.length;i++){
-      const p = pts[i-1], c = pts[i];
-      sCtx.quadraticCurveTo(p.x, p.y, (p.x + c.x)/2, (p.y + c.y)/2);
+  // Combined 2D overlay pass — drawn every frame in the main loop so we never
+  // mutate the DOM during gameplay. Renders crumbs first, then the swipe trail.
+  function drawOverlay(now){
+    const w = els.swipeCv.width, h = els.swipeCv.height;
+    sCtx.clearRect(0, 0, w, h);
+    // Crumbs
+    for (let i = crumbs.length - 1; i >= 0; i--){
+      const c = crumbs[i];
+      const t = (now - c.start) / 1000;
+      if (t >= CONFIG.crumb.lifeSec){ crumbs.splice(i, 1); continue }
+      const x = c.x + c.vx * t;
+      const y = c.y + c.vy * t + 200 * t * t;
+      const alpha = 1 - t / CONFIG.crumb.lifeSec;
+      sCtx.globalAlpha = Math.max(0, alpha);
+      sCtx.fillStyle = c.color;
+      if (c.round){
+        sCtx.beginPath(); sCtx.arc(x, y, c.sz/2, 0, Math.PI*2); sCtx.fill();
+      } else {
+        sCtx.fillRect(x - c.sz/2, y - c.sz/2, c.sz, c.sz);
+      }
     }
-    if (S.tool === 'knife'){
-      sCtx.strokeStyle = 'rgba(240,240,250,0.9)'; sCtx.lineWidth = 3;
-      sCtx.shadowColor = 'rgba(255,255,255,0.8)'; sCtx.shadowBlur = 15;
-    } else {
-      sCtx.strokeStyle = 'rgba(245,166,35,0.7)'; sCtx.lineWidth = 8; sCtx.lineCap = 'round';
-      sCtx.shadowColor = 'rgba(245,166,35,0.4)'; sCtx.shadowBlur = 10;
-      sCtx.setLineDash([4,8]);
+    sCtx.globalAlpha = 1;
+    // Swipe trail
+    if (S.swipe.on){
+      const pts = swipePts();
+      if (pts.length >= 2){
+        sCtx.beginPath();
+        sCtx.moveTo(pts[0].x, pts[0].y);
+        for (let i=1;i<pts.length;i++){
+          const p = pts[i-1], c = pts[i];
+          sCtx.quadraticCurveTo(p.x, p.y, (p.x + c.x)/2, (p.y + c.y)/2);
+        }
+        if (S.tool === 'knife'){
+          sCtx.strokeStyle = 'rgba(240,240,250,0.9)'; sCtx.lineWidth = 3;
+          sCtx.shadowColor = 'rgba(255,255,255,0.8)'; sCtx.shadowBlur = 15;
+        } else {
+          sCtx.strokeStyle = 'rgba(245,166,35,0.7)'; sCtx.lineWidth = 8; sCtx.lineCap = 'round';
+          sCtx.shadowColor = 'rgba(245,166,35,0.4)'; sCtx.shadowBlur = 10;
+          sCtx.setLineDash([4,8]);
+        }
+        sCtx.stroke();
+        sCtx.setLineDash([]);
+        sCtx.shadowBlur = 0;
+      }
     }
-    sCtx.stroke();
-    sCtx.setLineDash([]);
-    sCtx.shadowBlur = 0;
   }
 
   // ═══════════════════════════════════════
@@ -666,36 +694,56 @@
   //  ORIENTATION (gyro)
   // ═══════════════════════════════════════
   let gyroBase = null;
-  function captureGyroBase(e){ gyroBase = { alpha: e.alpha ?? 0, beta: e.beta ?? 0 } }
+  function screenAngle(){
+    if (screen.orientation && typeof screen.orientation.angle === 'number') return screen.orientation.angle;
+    if (typeof window.orientation === 'number') return window.orientation;
+    return 0;
+  }
+  function captureGyroBase(e){
+    gyroBase = { alpha: e.alpha ?? 0, beta: e.beta ?? 0, gamma: e.gamma ?? 0 };
+  }
   function onGyro(e){
     if (e.alpha == null) return;
     if (!gyroBase) captureGyroBase(e);
-    S.yaw = -(e.alpha - gyroBase.alpha) * Math.PI / 180;
-    S.pitch = Math.max(-1.2, Math.min(1.2, -((e.beta ?? 0) - gyroBase.beta - 45) * Math.PI / 180 * 0.5));
+    // Prefer iOS webkit compass heading when available (true north, no calibration drift)
+    const headingDeg = (typeof e.webkitCompassHeading === 'number')
+      ? -e.webkitCompassHeading                              // opposite sign convention
+      : (e.alpha - gyroBase.alpha);
+    const alphaRad = headingDeg * Math.PI / 180;
+    const betaRel = (e.beta ?? 0) - gyroBase.beta;
+    const gammaRel = (e.gamma ?? 0) - gyroBase.gamma;
+    const angle = screenAngle();
+    // Remap pitch source based on device orientation. In landscape, beta no longer
+    // represents tilt-forward; gamma does (with sign flipped between 90° and -90°).
+    let pitchSrc;
+    if (angle === 90)        pitchSrc =  gammaRel;          // landscape, home button right
+    else if (angle === -90 || angle === 270) pitchSrc = -gammaRel; // landscape, opposite
+    else                     pitchSrc =  betaRel - 45;      // portrait (or 180°)
+    S.yaw = -alphaRad;
+    S.pitch = Math.max(-1.2, Math.min(1.2, -pitchSrc * Math.PI / 180 * 0.5));
   }
-  function initGyro(){
-    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){
-      DeviceOrientationEvent.requestPermission()
-        .then(r => { if (r === 'granted') window.addEventListener('deviceorientation', onGyro) })
-        .catch(err => devLog('deviceorientation permission denied', err));
-    } else {
-      window.addEventListener('deviceorientation', onGyro);
+  function attachGyro(){
+    window.addEventListener('deviceorientation', onGyro);
+    if (screen.orientation && screen.orientation.addEventListener){
+      screen.orientation.addEventListener('change', ()=>{ gyroBase = null });
     }
-    // Re-baseline on orientation change so portrait <-> landscape doesn't drift
     window.addEventListener('orientationchange', ()=>{ gyroBase = null });
   }
 
   // ═══════════════════════════════════════
   //  TOUCH PAN (single-finger, no tool)
   // ═══════════════════════════════════════
+  // Single-finger pan: works always, EXCEPT when a tool is selected AND the cookie is
+  // in range (in which case the swipe is interpreted as a tool action by the handler below).
   function initTouchPan(){
     let drag = null;
     els.interact.addEventListener('touchstart', e=>{
-      if (S.tool || e.touches.length !== 1 || S.paused) return;
+      if (e.touches.length !== 1 || S.paused) return;
+      if (S.tool && S.inRange) return;       // let the tool swipe handler take this gesture
       drag = { x:e.touches[0].clientX, y:e.touches[0].clientY, yaw:S.yaw, pitch:S.pitch };
     });
     els.interact.addEventListener('touchmove', e=>{
-      if (!drag || S.tool || e.touches.length !== 1) return;
+      if (!drag || e.touches.length !== 1) return;
       S.yaw = drag.yaw + (e.touches[0].clientX - drag.x) * CONFIG.pan.touchSensitivity;
       S.pitch = Math.max(-1, Math.min(1, drag.pitch - (e.touches[0].clientY - drag.y) * CONFIG.pan.touchSensitivity));
     });
@@ -766,14 +814,12 @@
       const pt = { x:e.clientX, y:e.clientY };
       swipePush(pt.x, pt.y);
       applyDamage(pt);
-      drawTrail();
     }
   });
   els.interact.addEventListener('mouseup', ()=>{
     mDrag.on = false;
     if (S.swipe.on && S.swipe.source === 'mouse'){
       S.swipe.on = false; swipeClear();
-      setTimeout(()=> sCtx.clearRect(0, 0, els.swipeCv.width, els.swipeCv.height), 200);
     }
   });
   els.interact.addEventListener('contextmenu', e=> e.preventDefault());
@@ -829,12 +875,10 @@
     swipePush(pt.x, pt.y);
     applyDamage(pt);
     if (navigator.vibrate) navigator.vibrate(CONFIG.vibration.hit);
-    drawTrail();
   }, { passive:false });
   els.interact.addEventListener('touchend', ()=>{
     if (S.swipe.on && S.swipe.source === 'touch'){
       S.swipe.on = false; swipeClear();
-      setTimeout(()=> sCtx.clearRect(0, 0, els.swipeCv.width, els.swipeCv.height), 200);
     }
   });
 
@@ -870,7 +914,8 @@
     cookieGrp.rotation.z += (Math.random() - 0.5) * 0.06;
   }
 
-  // Crumb particle pool — throttled emission, single shared rAF in the main loop
+  // Crumb particles — pure data, drawn each frame onto the swipe canvas by drawOverlay.
+  // No DOM mutation during gameplay (avoids iOS Safari layout-pass-per-frame stalls).
   const crumbs = [];
   let lastCrumbAt = 0;
   function crumbFx(pt){
@@ -878,35 +923,15 @@
     if (now - lastCrumbAt < CONFIG.crumb.minIntervalMs) return;
     lastCrumbAt = now;
     for (let i=0;i<CONFIG.crumb.perEmission;i++){
-      const el = document.createElement('div');
-      el.className = 'crumb';
-      const sz = 3 + Math.random() * 7;
-      el.style.left = pt.x + 'px';
-      el.style.top = pt.y + 'px';
-      el.style.width = sz + 'px';
-      el.style.height = sz + 'px';
-      el.style.background = `hsl(${28 + Math.random()*20},${55 + Math.random()*35}%,${35 + Math.random()*35}%)`;
-      el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-      document.body.appendChild(el);
       crumbs.push({
-        el,
+        x: pt.x, y: pt.y,
+        sz: 3 + Math.random() * 7,
+        color: `hsl(${28 + Math.random()*20},${55 + Math.random()*35}%,${35 + Math.random()*35}%)`,
+        round: Math.random() > 0.5,
         start: now,
         vx: (Math.random() - 0.5) * 140,
         vy: -50 - Math.random() * 90,
       });
-    }
-  }
-  function stepCrumbs(now){
-    for (let i = crumbs.length - 1; i >= 0; i--){
-      const c = crumbs[i];
-      const t = (now - c.start) / 1000;
-      if (t >= CONFIG.crumb.lifeSec){
-        c.el.remove();
-        crumbs.splice(i, 1);
-        continue;
-      }
-      c.el.style.transform = `translate(${c.vx*t}px,${c.vy*t + 200*t*t}px) rotate(${t*400}deg)`;
-      c.el.style.opacity = String(1 - t / CONFIG.crumb.lifeSec);
     }
   }
 
@@ -1039,7 +1064,10 @@
       if (!onScreen){
         els.darrow.classList.add('show');
         const angle = Math.atan2(proj.y, proj.x);
-        const cx = innerWidth / 2, cy = innerHeight / 2, er = Math.min(cx, cy) * 0.65;
+        const vp = window.visualViewport;
+        const vw = vp ? vp.width : innerWidth;
+        const vh = vp ? vp.height : innerHeight;
+        const cx = vw / 2, cy = vh / 2, er = Math.min(cx, cy) * 0.65;
         els.darrow.style.left = (cx + Math.cos(angle) * er - 22) + 'px';
         els.darrow.style.top = (cy - Math.sin(angle) * er - 22) + 'px';
         els.darrow.style.transform = `rotate(${-angle + Math.PI/2}rad)`;
@@ -1056,17 +1084,22 @@
       els.apct.textContent = Math.round(pct) + '%';
     }
 
-    stepCrumbs(t);
+    drawOverlay(t);
     renderer.render(scene, cam);
   }
 
+  function viewSize(){
+    if (window.visualViewport) return { w: window.visualViewport.width, h: window.visualViewport.height };
+    return { w: innerWidth, h: innerHeight };
+  }
   function onResize(){
     if (!renderer || !cam) return;     // resize can fire before initThree
-    cam.aspect = innerWidth / innerHeight;
+    const { w, h } = viewSize();
+    cam.aspect = w / h;
     cam.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight);
+    renderer.setSize(w, h);
     resizeSwipe();
-    if (els.simCv){ els.simCv.width = innerWidth; els.simCv.height = innerHeight }
+    if (els.simCv){ els.simCv.width = w; els.simCv.height = h }
   }
   window.addEventListener('resize', onResize);
 
@@ -1076,37 +1109,77 @@
   loadProgress();
   if (S.caught > 0 || S.score > 0) updateHUD();
 
-  els.startBtn.addEventListener('click', async ()=>{
+  els.startBtn.addEventListener('click', e=>{
     els.startBtn.textContent = 'Initializing...';
     els.startBtn.disabled = true;
-    const camOk = await startCam();
-    if (!camOk){ devMode = true; initSimBg(); console.log('%c🍪 DEV MODE','color:#F5A623;font-size:14px') }
-    if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function'){
-      try{
-        const r = await DeviceMotionEvent.requestPermission();
-        if (r !== 'granted') devLog('devicemotion permission not granted; step detector disabled');
-        else stepper.init();
-      } catch(e){ devLog('devicemotion permission error', e) }
-    } else {
-      stepper.init();
-    }
-    startGPS();
-    els.gate.classList.add('hidden');
-    els.game.classList.add('active');
-    if (isDesktop || devMode){
-      els.devBanner.classList.add('show');
-      els.dhelp.classList.add('show');
-      els.ghint.style.display = 'none';
-    }
-    resizeSwipe();
-    initThree();
-    initGyro();
-    initTouchPan();
-    onResize();
-    requestAnimationFrame(loop);
-    showToast(devMode ? '⚙ Dev mode — drag to pan, scroll to approach' : '🍪 Find the cookie!');
-    updateHUD();
+
+    // iOS 13+: BOTH requestPermission calls MUST fire synchronously inside the user
+    // gesture. We kick off both as Promises BEFORE any await; they continue
+    // resolving while we start the camera.
+    const orientReq = (typeof DeviceOrientationEvent !== 'undefined'
+                      && typeof DeviceOrientationEvent.requestPermission === 'function')
+      ? DeviceOrientationEvent.requestPermission().catch(err => { devLog('orient perm error', err); return 'denied' })
+      : Promise.resolve('granted');
+    const motionReq = (typeof DeviceMotionEvent !== 'undefined'
+                      && typeof DeviceMotionEvent.requestPermission === 'function')
+      ? DeviceMotionEvent.requestPermission().catch(err => { devLog('motion perm error', err); return 'denied' })
+      : Promise.resolve('granted');
+
+    (async ()=>{
+      const [orientState, motionState] = await Promise.all([orientReq, motionReq]);
+      if (orientState === 'granted') attachGyro();
+      else devLog('deviceorientation not granted — gyro disabled, touch pan only');
+      if (motionState === 'granted') stepper.init();
+      else devLog('devicemotion not granted — step detector disabled');
+
+      const camOk = await startCam();
+      if (!camOk){ devMode = true; initSimBg(); console.log('%c🍪 DEV MODE','color:#F5A623;font-size:14px') }
+
+      startGPS();
+      els.gate.classList.add('hidden');
+      els.game.classList.add('active');
+      if (isDesktop || devMode){
+        els.devBanner.classList.add('show');
+        els.dhelp.classList.add('show');
+        els.ghint.style.display = 'none';
+      }
+      resizeSwipe();
+      initThree();
+      initTouchPan();
+      onResize();
+      requestAnimationFrame(loop);
+      showToast(devMode ? '⚙ Dev mode — drag to pan, scroll to approach' : '🍪 Find the cookie!');
+      updateHUD();
+    })();
   });
+
+  // ─── iOS gesture & lifecycle ───────────────────────────────────────────
+  // iOS 13+ ignores user-scalable=no for accessibility, so a two-finger pinch
+  // can still zoom the whole page. Block the non-standard 'gesture*' events
+  // (iOS-only) to keep our in-game pinch from also zooming Safari.
+  ['gesturestart','gesturechange','gestureend'].forEach(name => {
+    document.addEventListener(name, ev => ev.preventDefault(), { passive:false });
+  });
+  // Suppress iOS double-tap zoom on the game surface.
+  let lastTapAt = 0;
+  els.interact.addEventListener('touchend', ev => {
+    const now = Date.now();
+    if (now - lastTapAt < 300) ev.preventDefault();
+    lastTapAt = now;
+  }, { passive:false });
+
+  // iOS pauses media + rAF when backgrounded; resume the video stream on return.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && els.video.srcObject){
+      els.video.play?.().catch(err => devLog('video resume failed', err));
+    }
+  });
+
+  // visualViewport gives the *visible* viewport size, accounting for Safari's
+  // collapsing URL bar. Fall back to innerWidth/innerHeight on older browsers.
+  if (window.visualViewport){
+    window.visualViewport.addEventListener('resize', onResize);
+  }
 
   // GPS pre-flight on gate
   if (ZONE.lat != null){

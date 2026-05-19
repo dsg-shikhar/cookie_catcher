@@ -22,6 +22,7 @@
   #start-btn{background:var(--gold);color:var(--brown);border:none;border-radius:60px;padding:1rem 3rem;font-family:'Fredoka',sans-serif;font-size:1.2rem;font-weight:700;cursor:pointer;box-shadow:0 8px 30px rgba(245,166,35,0.4),inset 0 -3px 0 var(--gold-dark);transition:transform 0.2s}
   #start-btn:active{transform:scale(0.95)}
   #start-btn:disabled{opacity:0.5}
+  #start-btn:focus-visible{outline:3px solid var(--cream);outline-offset:3px}
   #error-msg{color:var(--red);margin-top:1rem;font-size:0.85rem;max-width:280px}
   #gps-status{margin-top:0.5rem;font-size:0.75rem;opacity:0.6}
   @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
@@ -80,6 +81,7 @@
   #tools{position:absolute;bottom:0;left:0;right:0;z-index:10;padding:0 1rem 2rem;display:flex;justify-content:center;gap:1rem;align-items:flex-end}
   .tb{width:72px;height:72px;border-radius:50%;border:3px solid rgba(255,255,255,0.3);background:var(--bg-dark);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;font-size:2rem;cursor:pointer;transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);position:relative}
   .tb.active{border-color:var(--gold);background:rgba(245,166,35,0.25);transform:scale(1.15);box-shadow:0 0 30px rgba(245,166,35,0.4)}
+  .tb:focus-visible{outline:3px solid var(--cream);outline-offset:3px}
   .tb .tl{position:absolute;bottom:-20px;font-size:0.6rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
   .tb.active .tl{color:var(--gold)}
 
@@ -87,6 +89,7 @@
   #dhelp{position:absolute;bottom:6.5rem;left:1rem;z-index:10;background:var(--bg-dark);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:12px;padding:0.5rem 0.8rem;font-size:0.6rem;color:rgba(255,255,255,0.5);line-height:1.6;display:none;font-family:'Space Mono',monospace;border:1px solid rgba(255,255,255,0.1)}
   #dhelp.show{display:block}
   #dhelp kbd{background:rgba(255,255,255,0.15);border-radius:3px;padding:1px 5px;font-size:0.6rem;border:1px solid rgba(255,255,255,0.2)}
+  @media (max-width:600px){#dhelp.show{display:none}}
 
   /* Hint */
   #ghint{position:absolute;bottom:7rem;left:50%;transform:translateX(-50%);z-index:10;color:rgba(255,255,255,0.5);font-size:0.75rem;text-align:center;pointer-events:none;animation:hfade 5s ease-out forwards}
@@ -100,6 +103,7 @@
   #prize p{opacity:0.7;font-size:1rem}
   #prize .pp{font-size:2.5rem;font-weight:700;color:var(--gold);margin:0.5rem 0 1.5rem;font-family:'Space Mono',monospace}
   #prize button{background:var(--gold);color:var(--brown);border:none;border-radius:60px;padding:0.8rem 2.5rem;font-family:'Fredoka',sans-serif;font-size:1.1rem;font-weight:700;cursor:pointer}
+  #prize button:focus-visible{outline:3px solid var(--cream);outline-offset:3px}
   @keyframes pbounce{0%{transform:scale(0) rotate(-20deg)}60%{transform:scale(1.2) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
 
   .toast{position:fixed;top:5rem;left:50%;transform:translateX(-50%) translateY(-20px);z-index:50;background:var(--bg-dark);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--cream);padding:0.8rem 1.5rem;border-radius:12px;font-size:0.9rem;opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;border:1px solid rgba(245,166,35,0.3)}
@@ -112,7 +116,9 @@
   #oob.show{display:flex}
   #oob h2{font-size:1.6rem;margin-bottom:0.5rem}
   #oob p{opacity:0.7;max-width:280px;line-height:1.5;margin-bottom:1rem}
-  #oob .da{font-family:'Space Mono',monospace;font-size:1.2rem;color:var(--gold)}
+  #oob .da{font-family:'Space Mono',monospace;font-size:1.2rem;color:var(--gold);margin-bottom:1rem}
+  #oob button{background:transparent;color:var(--cream);border:1px solid rgba(255,248,231,0.4);border-radius:60px;padding:0.6rem 1.5rem;font-family:'Fredoka',sans-serif;font-size:0.85rem;cursor:pointer;margin-top:0.5rem}
+  #oob button:focus-visible{outline:3px solid var(--cream);outline-offset:3px}
 
   /* Cookie health bar */
   #cookie-hp{position:absolute;top:40%;left:50%;transform:translateX(-50%);z-index:10;pointer-events:none;width:120px;opacity:0;transition:opacity 0.3s}
@@ -120,22 +126,33 @@
   #cookie-hp .bar{height:6px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden}
   #cookie-hp .fill{height:100%;background:var(--gold);border-radius:3px;transition:width 0.15s}
   #cookie-hp .lbl{text-align:center;font-size:0.6rem;color:rgba(255,255,255,0.5);margin-top:2px}
+
+  /* Respect prefers-reduced-motion */
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:0.001ms !important;animation-iteration-count:1 !important;transition-duration:0.001ms !important;scroll-behavior:auto !important}
+  }
 </style>
 </head>
 <body>
 <!-- Gate -->
-<div id="gate">
-  <div class="emoji">🍪</div>
-  <h1>Cookie Catcher</h1>
-  <p>Point your camera around to find hidden cookies. Use your knife & fork to catch them!<br><span style="font-size:0.75rem;opacity:0.6">Desktop dev mode supported</span></p>
+<div id="gate" role="dialog" aria-labelledby="gate-title">
+  <div class="emoji" aria-hidden="true">🍪</div>
+  <h1 id="gate-title">Cookie Catcher</h1>
+  <p>Point your camera around to find hidden cookies. Use your knife &amp; fork to catch them!<br><span style="font-size:0.75rem;opacity:0.6">Desktop dev mode supported</span></p>
   <div class="zone-box"><div class="zn" id="zn">Loading...</div><div class="zd" id="zd"></div></div>
   <button id="start-btn">Start Hunting</button>
-  <div id="error-msg"></div>
+  <div id="error-msg" role="alert"></div>
   <div id="gps-status"></div>
 </div>
 
 <!-- OOB -->
-<div id="oob"><div style="font-size:3rem;margin-bottom:1rem">📍</div><h2>Out of Range</h2><p>You've moved too far from the cookie zone.</p><div class="da" id="oob-dist"></div></div>
+<div id="oob" role="dialog" aria-labelledby="oob-title">
+  <div style="font-size:3rem;margin-bottom:1rem" aria-hidden="true">📍</div>
+  <h2 id="oob-title">Out of Range</h2>
+  <p>You've moved too far from the cookie zone.</p>
+  <div class="da" id="oob-dist"></div>
+  <button id="oob-dismiss" type="button">Continue anyway (dev)</button>
+</div>
 
 <!-- Game -->
 <div id="game">
@@ -146,7 +163,7 @@
   <canvas id="swipe-cv"></canvas>
   <div id="interact"></div>
 
-  <div id="xhair">
+  <div id="xhair" aria-hidden="true">
     <svg viewBox="0 0 60 60" fill="none" stroke="rgba(255,248,231,0.8)" stroke-width="1.5">
       <circle cx="30" cy="30" r="20" stroke-dasharray="4 6"/>
       <line x1="30" y1="4" x2="30" y2="14"/><line x1="30" y1="46" x2="30" y2="56"/>
@@ -155,24 +172,24 @@
     </svg>
   </div>
 
-  <div id="radar"><div class="rg"></div><div class="rg"></div><div class="rg"></div></div>
-  <svg id="darrow" viewBox="0 0 40 40"><polygon points="20,4 34,32 20,26 6,32" fill="#F5A623" opacity="0.9"/></svg>
+  <div id="radar" aria-hidden="true"><div class="rg"></div><div class="rg"></div><div class="rg"></div></div>
+  <svg id="darrow" viewBox="0 0 40 40" aria-hidden="true"><polygon points="20,4 34,32 20,26 6,32" fill="#F5A623" opacity="0.9"/></svg>
 
-  <div id="dbar"><div id="dfill" style="height:30%"></div></div>
-  <div id="dlabel">Distance</div>
+  <div id="dbar" aria-hidden="true"><div id="dfill" style="height:30%"></div></div>
+  <div id="dlabel" aria-hidden="true">Distance</div>
 
-  <div id="approach"><span>🚶 Approach</span><div class="ab"><div class="af" id="afill" style="width:0%"></div></div><span id="apct">0%</span></div>
-  <div id="cookie-hp"><div class="bar"><div class="fill" id="hp-fill" style="width:100%"></div></div><div class="lbl">Cookie HP</div></div>
+  <div id="approach" aria-hidden="true"><span>🚶 Approach</span><div class="ab"><div class="af" id="afill" style="width:0%"></div></div><span id="apct">0%</span></div>
+  <div id="cookie-hp" aria-hidden="true"><div class="bar"><div class="fill" id="hp-fill" style="width:100%"></div></div><div class="lbl">Cookie HP</div></div>
 
   <div id="hud">
-    <div class="hp"><div class="lb">Score</div><div class="vl" id="sv">0</div></div>
-    <div class="hp" style="text-align:center"><div class="lb">Caught</div><div class="vs" id="cv">0 / 5</div></div>
+    <div class="hp"><div class="lb">Score</div><div class="vl" id="sv" aria-live="polite">0</div></div>
+    <div class="hp" style="text-align:center"><div class="lb">Caught</div><div class="vs" id="cv-caught" aria-live="polite">0 / 5</div></div>
   </div>
   <div id="hzone"></div>
 
-  <div id="tools">
-    <div class="tb" id="t-knife">🔪<span class="tl">Knife</span></div>
-    <div class="tb" id="t-fork">🍴<span class="tl">Fork</span></div>
+  <div id="tools" role="toolbar" aria-label="Game tools">
+    <button class="tb" id="t-knife" type="button" aria-pressed="false" aria-label="Knife tool (key 1)"><span aria-hidden="true">🔪</span><span class="tl">Knife</span></button>
+    <button class="tb" id="t-fork" type="button" aria-pressed="false" aria-label="Fork tool (key 2)"><span aria-hidden="true">🍴</span><span class="tl">Fork</span></button>
   </div>
 
   <div id="ghint">📱 Move phone to look · Pinch to approach · Walk closer</div>
@@ -186,52 +203,91 @@
 </div>
 
 <!-- Prize -->
-<div id="prize">
-  <div class="pi" id="p-icon">🎁</div>
+<div id="prize" role="dialog" aria-labelledby="p-title">
+  <div class="pi" id="p-icon" aria-hidden="true">🎁</div>
   <h2 id="p-title">Prize!</h2>
   <p id="p-desc"></p>
   <div class="pp" id="p-pts">+100</div>
-  <button id="p-cont">Continue</button>
+  <button id="p-cont" type="button">Continue</button>
 </div>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!--
+  SECURITY: Three.js is loaded from a CDN. Add an `integrity="sha384-..."` attribute
+  to the <script> tag below to enable SRI. The hash for cdnjs r128 can be computed via:
+    curl -fsSL https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js \
+      | openssl dgst -sha384 -binary | openssl base64 -A
+  The build sandbox here can't reach the CDN, so the attribute is left as a TODO.
+  Ideally, migrate to a pinned modern release (r160+) loaded via <script type="module">
+  + importmap so security/perf fixes from the last 5 years are picked up.
+-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous"></script>
 <script>
 (()=>{
+  'use strict';
+
+  // ═══════════════════════════════════════
+  //  CONFIG — all tunables live here
+  // ═══════════════════════════════════════
+  const CONFIG = {
+    totalCookies: 5,
+    defaultSeed: 42,
+    defaultRadius: 150,
+    pan: { touchSensitivity: 0.005, mouseSensitivity: 0.003, smoothing: 0.12 },
+    approach: { wheelStep: 0.001, keyStep: 0.04, pinchScale: 0.02, stepReduction: 0.05 },
+    step: { accelThreshold: 3.5, minIntervalMs: 350, sampleWindow: 20 },
+    damage: { knife: 0.15, fork: 0.10 },
+    inRangeDist: 2.5,
+    swipeMaxPts: 60,
+    cookieMaxFx: 24,            // cap damage meshes per cookie (prevents leak)
+    crumb: { minIntervalMs: 50, perEmission: 2, lifeSec: 0.9 },
+    vibration: { tool: 30, hit: 10, catch: [50,30,100], step: 15 },
+    storage: { keyPrefix: 'cookiecatcher:' },
+  };
+
   // ═══════════════════════════════════════
   //  QR ZONE + SEEDED PRNG
   // ═══════════════════════════════════════
-  const P=new URLSearchParams(location.search);
-  const ZONE={id:P.get('zone')||'demo-zone',seed:parseInt(P.get('seed'))||42,lat:parseFloat(P.get('lat'))||null,lng:parseFloat(P.get('lng'))||null,radius:parseFloat(P.get('radius'))||150,name:decodeURIComponent(P.get('name')||P.get('zone')||'Demo Zone')};
-  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-  const srand=mulberry32(ZONE.seed);
-  function haversine(a,b,c,d){const R=6371e3,x=(c-a)*Math.PI/180,y=(d-b)*Math.PI/180,q=Math.sin(x/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(y/2)**2;return R*2*Math.atan2(Math.sqrt(q),Math.sqrt(1-q))}
-
-  let userGPS={lat:null,lng:null};
-  function startGPS(){
-    if(!navigator.geolocation)return;
-    navigator.geolocation.watchPosition(p=>{
-      userGPS.lat=p.coords.latitude;userGPS.lng=p.coords.longitude;
-      if(ZONE.lat&&ZONE.lng){const d=haversine(userGPS.lat,userGPS.lng,ZONE.lat,ZONE.lng);
-        if(d>ZONE.radius){document.getElementById('oob').classList.add('show');document.getElementById('oob-dist').textContent=`${Math.round(d-ZONE.radius)}m outside`}
-        else document.getElementById('oob').classList.remove('show')}
-    },()=>{},{enableHighAccuracy:true,maximumAge:5000,timeout:10000});
+  const P = new URLSearchParams(location.search);
+  function safeParseInt(v, fallback){
+    if (v == null || v === '') return fallback;
+    const n = Number.parseInt(v, 10);
+    return Number.isFinite(n) ? n : fallback;
   }
-
-  document.getElementById('zn').textContent=ZONE.name;
-  document.getElementById('zd').textContent=ZONE.lat?`Seed ${ZONE.seed} · GPS-locked (${ZONE.radius}m)`:`Seed ${ZONE.seed} · No GPS lock`;
-
-  // Step detector
-  const stepper={samples:[],last:0,onStep:null,init(){window.addEventListener('devicemotion',e=>{const a=e.accelerationIncludingGravity;if(!a||a.x===null)return;const m=Math.sqrt(a.x**2+a.y**2+a.z**2);this.samples.push(m);if(this.samples.length>20)this.samples.shift();const avg=this.samples.reduce((s,v)=>s+v,0)/this.samples.length,now=Date.now();if(m-avg>3.5&&now-this.last>350){this.last=now;if(this.onStep)this.onStep()}})}};
+  function safeParseFloat(v){
+    if (v == null || v === '') return null;
+    const n = Number.parseFloat(v);
+    return Number.isFinite(n) ? n : null;
+  }
+  const ZONE = {
+    id: P.get('zone') || 'demo-zone',
+    seed: safeParseInt(P.get('seed'), CONFIG.defaultSeed),
+    lat: safeParseFloat(P.get('lat')),
+    lng: safeParseFloat(P.get('lng')),
+    radius: safeParseFloat(P.get('radius')) ?? CONFIG.defaultRadius,
+    name: decodeURIComponent(P.get('name') || P.get('zone') || 'Demo Zone'),
+  };
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  function haversine(a,b,c,d){const R=6371e3,x=(c-a)*Math.PI/180,y=(d-b)*Math.PI/180,q=Math.sin(x/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(y/2)**2;return R*2*Math.atan2(Math.sqrt(q),Math.sqrt(1-q))}
 
   // ═══════════════════════════════════════
   //  STATE
   // ═══════════════════════════════════════
-  const S={score:0,caught:0,total:5,tool:null,inRange:false,touch:{on:false,pts:[]},cookie:null,yaw:0,pitch:0,approach:1.0,pinchD:0,pinchOn:false};
-  const isDesktop=!('ontouchstart'in window)||navigator.maxTouchPoints===0;
-  let devMode=false;
+  const S = {
+    score: 0, caught: 0, total: CONFIG.totalCookies,
+    tool: null, inRange: false,
+    swipe: { on:false, source:null, pts:[], head:0 },   // ring buffer; source = 'mouse' | 'touch'
+    cookie: null,
+    yaw: 0, pitch: 0, approach: 1.0,
+    pinchD: 0, pinchOn: false,
+    paused: false,                  // set true when out-of-bounds; blocks gameplay input + damage
+    gameOver: false,
+    runId: 0,                       // monotonic; used for spawn seeding so positions don't repeat on restart
+  };
+  const isDesktop = !('ontouchstart' in window) || navigator.maxTouchPoints === 0;
+  let devMode = false;
 
-  const prizes=[
+  const prizes = [
     {icon:'🎟️',title:'10% Off Coupon',desc:'Use at any partner store',pts:100},
     {icon:'⭐',title:'Gold Star',desc:'Added to your collection',pts:150},
     {icon:'🧁',title:'Free Cupcake',desc:'Redeem at the bakery counter',pts:200},
@@ -239,490 +295,838 @@
     {icon:'☕',title:'Free Coffee',desc:'Any size, any flavor',pts:120},
   ];
 
-  // DOM
-  const $=id=>document.getElementById(id);
-  const gate=$('gate'),startBtn=$('start-btn'),errMsg=$('error-msg'),gpsStatus=$('gps-status');
-  const game=$('game'),video=$('cam-video'),threeCv=$('three-layer'),swipeCv=$('swipe-cv'),interact=$('interact');
-  const sv=$('sv'),cv=$('cv'),xhair=$('xhair'),radar=$('radar'),darrow=$('darrow');
-  const dfill=$('dfill'),approachEl=$('approach'),afill=$('afill'),apct=$('apct');
-  const hpFill=$('hp-fill'),cookieHp=$('cookie-hp');
-  const tKnife=$('t-knife'),tFork=$('t-fork');
-  const prize=$('prize'),pIcon=$('p-icon'),pTitle=$('p-title'),pDesc=$('p-desc'),pPts=$('p-pts'),pCont=$('p-cont');
-  const toast=$('toast');
-  $('hzone').textContent=`📍 ${ZONE.name}`;
+  // ═══════════════════════════════════════
+  //  PERSISTENCE
+  // ═══════════════════════════════════════
+  const storageKey = CONFIG.storage.keyPrefix + ZONE.id;
+  function loadProgress(){
+    try{
+      const raw = localStorage.getItem(storageKey);
+      if (!raw) return;
+      const j = JSON.parse(raw);
+      if (typeof j.score === 'number') S.score = j.score;
+      if (typeof j.caught === 'number' && j.caught < S.total) S.caught = j.caught;
+      if (typeof j.runId === 'number') S.runId = j.runId;
+    }catch(e){ devLog('loadProgress failed', e) }
+  }
+  function saveProgress(){
+    try{
+      localStorage.setItem(storageKey, JSON.stringify({ score:S.score, caught:S.caught, runId:S.runId }));
+    }catch(e){ devLog('saveProgress failed', e) }
+  }
+  function clearProgress(){ try{ localStorage.removeItem(storageKey) }catch(e){} }
 
   // ═══════════════════════════════════════
-  //  THREE.JS — Direct renderer (preserves alpha!)
+  //  DOM
   // ═══════════════════════════════════════
-  let scene,cam,renderer,cookieGrp;
-  // DoF simulation objects
-  let dofBlurSphere=null;
+  const $ = id => document.getElementById(id);
+  const els = {
+    gate: $('gate'), startBtn: $('start-btn'), errMsg: $('error-msg'), gpsStatus: $('gps-status'),
+    game: $('game'), video: $('cam-video'), threeCv: $('three-layer'), swipeCv: $('swipe-cv'),
+    interact: $('interact'),
+    score: $('sv'), caughtLabel: $('cv-caught'),
+    xhair: $('xhair'), radar: $('radar'), darrow: $('darrow'),
+    dfill: $('dfill'), approach: $('approach'), afill: $('afill'), apct: $('apct'),
+    hpFill: $('hp-fill'), cookieHp: $('cookie-hp'),
+    tKnife: $('t-knife'), tFork: $('t-fork'),
+    prize: $('prize'), pIcon: $('p-icon'), pTitle: $('p-title'),
+    pDesc: $('p-desc'), pPts: $('p-pts'), pCont: $('p-cont'),
+    toast: $('toast'),
+    oob: $('oob'), oobDist: $('oob-dist'), oobDismiss: $('oob-dismiss'),
+    hzone: $('hzone'), zn: $('zn'), zd: $('zd'),
+    devBanner: $('dev-banner'), dhelp: $('dhelp'), ghint: $('ghint'),
+    simBg: $('sim-bg'), simCv: $('sim-cv'),
+  };
+
+  function devLog(...a){ if (devMode || P.get('debug') === '1') console.warn('[cookie]', ...a) }
+
+  els.zn.textContent = ZONE.name;
+  els.zd.textContent = ZONE.lat ? `Seed ${ZONE.seed} · GPS-locked (${ZONE.radius}m)` : `Seed ${ZONE.seed} · No GPS lock`;
+  els.hzone.textContent = `📍 ${ZONE.name}`;
+
+  // ═══════════════════════════════════════
+  //  GPS
+  // ═══════════════════════════════════════
+  const userGPS = { lat:null, lng:null };
+  function startGPS(){
+    if (!navigator.geolocation) return;
+    navigator.geolocation.watchPosition(p=>{
+      userGPS.lat = p.coords.latitude; userGPS.lng = p.coords.longitude;
+      if (ZONE.lat != null && ZONE.lng != null){
+        const d = haversine(userGPS.lat, userGPS.lng, ZONE.lat, ZONE.lng);
+        if (d > ZONE.radius){
+          els.oob.classList.add('show');
+          els.oobDist.textContent = `${Math.round(d - ZONE.radius)}m outside`;
+          S.paused = true;
+        } else {
+          els.oob.classList.remove('show');
+          S.paused = false;
+        }
+      }
+    }, err => devLog('geolocation watch error', err), { enableHighAccuracy:true, maximumAge:5000, timeout:10000 });
+  }
+  els.oobDismiss.addEventListener('click', ()=>{
+    els.oob.classList.remove('show');
+    S.paused = false;
+    showToast('Continuing in dev mode');
+  });
+
+  // ═══════════════════════════════════════
+  //  STEP DETECTOR
+  // ═══════════════════════════════════════
+  const stepper = {
+    samples: [], head: 0, last: 0, onStep: null, ready: false,
+    init(){
+      const handler = e => {
+        const a = e.accelerationIncludingGravity;
+        if (!a || a.x === null) return;
+        const m = Math.sqrt(a.x**2 + a.y**2 + a.z**2);
+        // ring buffer (no array shifting)
+        if (this.samples.length < CONFIG.step.sampleWindow) this.samples.push(m);
+        else { this.samples[this.head] = m; this.head = (this.head + 1) % CONFIG.step.sampleWindow }
+        let sum = 0;
+        for (let i=0;i<this.samples.length;i++) sum += this.samples[i];
+        const avg = sum / this.samples.length;
+        const now = Date.now();
+        if (m - avg > CONFIG.step.accelThreshold && now - this.last > CONFIG.step.minIntervalMs){
+          this.last = now;
+          if (this.onStep) this.onStep();
+        }
+      };
+      window.addEventListener('devicemotion', handler);
+      this.ready = true;
+    }
+  };
+
+  // ═══════════════════════════════════════
+  //  THREE.JS
+  // ═══════════════════════════════════════
+  let scene, cam, renderer, cookieGrp, dofBlurSphere;
+  const _scratchV = new THREE.Vector3();        // reused per-frame
+  const _scratchDir = new THREE.Vector3();
 
   function initThree(){
-    scene=new THREE.Scene();
-    cam=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,100);
+    scene = new THREE.Scene();
+    cam = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 100);
     cam.position.set(0,0,0);
 
-    renderer=new THREE.WebGLRenderer({canvas:threeCv,alpha:true,antialias:true});
-    renderer.setSize(innerWidth,innerHeight);
-    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-    renderer.setClearColor(0x000000,0); // transparent!
-    renderer.sortObjects=true;
+    renderer = new THREE.WebGLRenderer({ canvas: els.threeCv, alpha:true, antialias:true });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0);
+    renderer.sortObjects = true;
 
-    // Lighting
-    scene.add(new THREE.AmbientLight(0xffffff,0.7));
-    const dl=new THREE.DirectionalLight(0xfff5e0,1.2);dl.position.set(3,5,4);scene.add(dl);
-    const dl2=new THREE.DirectionalLight(0xffe0c0,0.4);dl2.position.set(-2,3,-3);scene.add(dl2);
-    const pl=new THREE.PointLight(0xf5a623,0.6,15);pl.position.set(0,2,0);scene.add(pl);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    const dl  = new THREE.DirectionalLight(0xfff5e0, 1.2); dl.position.set(3,5,4);  scene.add(dl);
+    const dl2 = new THREE.DirectionalLight(0xffe0c0, 0.4); dl2.position.set(-2,3,-3); scene.add(dl2);
+    const pl  = new THREE.PointLight(0xf5a623, 0.6, 15);   pl.position.set(0,2,0);  scene.add(pl);
 
     spawnCookie();
   }
 
-  function makeCookie(){
-    const g=new THREE.Group();
+  function disposeObject3D(obj){
+    obj.traverse(n=>{
+      if (n.geometry) n.geometry.dispose();
+      if (n.material){
+        const mats = Array.isArray(n.material) ? n.material : [n.material];
+        for (const m of mats) m.dispose();
+      }
+    });
+  }
 
-    // Cookie body — thick disc
-    const geo=new THREE.CylinderGeometry(0.4,0.43,0.12,48,4);
-    const pos=geo.attributes.position;
-    for(let i=0;i<pos.count;i++){
-      const x=pos.getX(i),z=pos.getZ(i),a=Math.atan2(z,x),d=Math.sqrt(x*x+z*z);
-      const n=Math.sin(a*7)*0.012+Math.cos(a*13)*0.006+Math.sin(a*3)*0.008;
-      if(d>0.1){pos.setX(i,x+Math.cos(a)*n);pos.setZ(i,z+Math.sin(a)*n)}
+  function makeCookie(){
+    const g = new THREE.Group();
+
+    const geo = new THREE.CylinderGeometry(0.4, 0.43, 0.12, 48, 4);
+    const pos = geo.attributes.position;
+    for (let i=0;i<pos.count;i++){
+      const x = pos.getX(i), z = pos.getZ(i), a = Math.atan2(z,x), d = Math.sqrt(x*x + z*z);
+      const n = Math.sin(a*7)*0.012 + Math.cos(a*13)*0.006 + Math.sin(a*3)*0.008;
+      if (d > 0.1){ pos.setX(i, x + Math.cos(a)*n); pos.setZ(i, z + Math.sin(a)*n) }
     }
     geo.computeVertexNormals();
 
-    const bodyMat=new THREE.MeshStandardMaterial({color:0xC8871A,roughness:0.82,metalness:0.05});
-    const body=new THREE.Mesh(geo,bodyMat);
-    body.castShadow=true;
+    const bodyMat = new THREE.MeshStandardMaterial({ color:0xC8871A, roughness:0.82, metalness:0.05 });
+    bodyMat.userData.origRough = bodyMat.roughness;
+    const body = new THREE.Mesh(geo, bodyMat);
+    body.castShadow = true;
     g.add(body);
 
-    // Top surface — slightly different color for baked look
-    const topGeo=new THREE.CylinderGeometry(0.38,0.4,0.015,48);
-    const topMat=new THREE.MeshStandardMaterial({color:0xD4961F,roughness:0.75,metalness:0.08});
-    const top=new THREE.Mesh(topGeo,topMat);
-    top.position.y=0.06;
+    const topGeo = new THREE.CylinderGeometry(0.38, 0.4, 0.015, 48);
+    const topMat = new THREE.MeshStandardMaterial({ color:0xD4961F, roughness:0.75, metalness:0.08 });
+    topMat.userData.origRough = topMat.roughness;
+    const top = new THREE.Mesh(topGeo, topMat);
+    top.position.y = 0.06;
     g.add(top);
 
-    // Chocolate chips
-    const chipGeo=new THREE.SphereGeometry(0.045,10,8);
-    const chipMat=new THREE.MeshStandardMaterial({color:0x2A1506,roughness:0.55,metalness:0.15});
-    const sr=mulberry32(ZONE.seed+S.caught*71);
-    for(let i=0;i<9;i++){
-      const chip=new THREE.Mesh(chipGeo,chipMat);
-      const a=(i/9)*Math.PI*2+sr()*0.6;
-      const r=0.08+sr()*0.25;
-      chip.position.set(Math.cos(a)*r,0.06+sr()*0.015,Math.sin(a)*r);
-      chip.scale.set(1,0.55+sr()*0.3,1);
-      chip.rotation.set(sr()*0.5,sr()*Math.PI,sr()*0.5);
+    // Per-cookie deterministic RNG: salt with runId so a restart isn't identical
+    const sr = mulberry32(ZONE.seed + S.caught*71 + S.runId*9173);
+    const chipGeo = new THREE.SphereGeometry(0.045, 10, 8);
+    const chipMat = new THREE.MeshStandardMaterial({ color:0x2A1506, roughness:0.55, metalness:0.15 });
+    chipMat.userData.origRough = chipMat.roughness;
+    for (let i=0;i<9;i++){
+      const chip = new THREE.Mesh(chipGeo, chipMat);
+      const a = (i/9)*Math.PI*2 + sr()*0.6;
+      const r = 0.08 + sr()*0.25;
+      chip.position.set(Math.cos(a)*r, 0.06 + sr()*0.015, Math.sin(a)*r);
+      chip.scale.set(1, 0.55 + sr()*0.3, 1);
+      chip.rotation.set(sr()*0.5, sr()*Math.PI, sr()*0.5);
       g.add(chip);
     }
 
-    // Sugar/salt crystals
-    const crystGeo=new THREE.OctahedronGeometry(0.012,0);
-    const crystMat=new THREE.MeshStandardMaterial({color:0xFFFDE8,roughness:0.15,metalness:0.9,emissive:0xFFFDE8,emissiveIntensity:0.15});
-    for(let i=0;i<20;i++){
-      const c=new THREE.Mesh(crystGeo,crystMat);
-      const a=sr()*Math.PI*2,r=sr()*0.35;
-      c.position.set(Math.cos(a)*r,0.07+sr()*0.01,Math.sin(a)*r);
-      c.rotation.set(sr()*Math.PI,sr()*Math.PI,sr()*Math.PI);
+    const crystGeo = new THREE.OctahedronGeometry(0.012, 0);
+    const crystMat = new THREE.MeshStandardMaterial({ color:0xFFFDE8, roughness:0.15, metalness:0.9, emissive:0xFFFDE8, emissiveIntensity:0.15 });
+    crystMat.userData.origRough = crystMat.roughness;
+    for (let i=0;i<20;i++){
+      const c = new THREE.Mesh(crystGeo, crystMat);
+      const a = sr()*Math.PI*2, r = sr()*0.35;
+      c.position.set(Math.cos(a)*r, 0.07 + sr()*0.01, Math.sin(a)*r);
+      c.rotation.set(sr()*Math.PI, sr()*Math.PI, sr()*Math.PI);
       g.add(c);
     }
 
-    // Edge crackle details
-    const crackGeo=new THREE.BoxGeometry(0.02,0.06,0.06);
-    const crackMat=new THREE.MeshStandardMaterial({color:0xA06810,roughness:0.9});
-    for(let i=0;i<12;i++){
-      const c=new THREE.Mesh(crackGeo,crackMat);
-      const a=(i/12)*Math.PI*2;
-      c.position.set(Math.cos(a)*0.39,0,Math.sin(a)*0.39);
-      c.rotation.y=a;
+    const crackGeo = new THREE.BoxGeometry(0.02, 0.06, 0.06);
+    const crackMat = new THREE.MeshStandardMaterial({ color:0xA06810, roughness:0.9 });
+    crackMat.userData.origRough = crackMat.roughness;
+    for (let i=0;i<12;i++){
+      const c = new THREE.Mesh(crackGeo, crackMat);
+      const a = (i/12)*Math.PI*2;
+      c.position.set(Math.cos(a)*0.39, 0, Math.sin(a)*0.39);
+      c.rotation.y = a;
       g.add(c);
     }
 
+    // Track which children were original (so cleanup of damage FX doesn't touch them)
+    g.userData.baselineChildCount = g.children.length;
+    g.userData.fxQueue = [];
     return g;
   }
 
-  // DoF blur sphere — a semi-transparent sphere around cookie that fades as you approach
   function makeBlurSphere(){
-    const geo=new THREE.SphereGeometry(0.8,16,12);
-    const mat=new THREE.MeshBasicMaterial({color:0x88aacc,transparent:true,opacity:0.0,depthWrite:false,side:THREE.BackSide});
-    return new THREE.Mesh(geo,mat);
+    const geo = new THREE.SphereGeometry(0.8, 16, 12);
+    const mat = new THREE.MeshBasicMaterial({ color:0x88aacc, transparent:true, opacity:0, depthWrite:false, side:THREE.BackSide });
+    return new THREE.Mesh(geo, mat);
   }
 
   function spawnCookie(){
-    if(cookieGrp)scene.remove(cookieGrp);
-    if(dofBlurSphere)scene.remove(dofBlurSphere);
+    if (cookieGrp){ scene.remove(cookieGrp); disposeObject3D(cookieGrp) }
+    if (dofBlurSphere){ scene.remove(dofBlurSphere); disposeObject3D(dofBlurSphere) }
 
-    cookieGrp=makeCookie();
+    cookieGrp = makeCookie();
 
-    // Deterministic position from seed + cookie index
-    const sr=mulberry32(ZONE.seed+S.caught*137);
-    const yaw=(sr()-0.5)*Math.PI*1.2;
-    const pitch=(sr()-0.5)*0.5;
-    const dist=3+sr()*3;
+    const sr = mulberry32(ZONE.seed + S.caught*137 + S.runId*8191);
+    const yaw   = (sr() - 0.5) * Math.PI * 1.2;
+    const pitch = (sr() - 0.5) * 0.5;
+    const dist  = 3 + sr() * 3;
 
-    const px=Math.sin(yaw)*Math.cos(pitch)*dist;
-    const py=Math.sin(pitch)*dist*0.3;
-    const pz=-Math.cos(yaw)*Math.cos(pitch)*dist;
+    const px = Math.sin(yaw)*Math.cos(pitch)*dist;
+    const py = Math.sin(pitch)*dist*0.3;
+    const pz = -Math.cos(yaw)*Math.cos(pitch)*dist;
 
-    cookieGrp.position.set(px,py,pz);
-    // Face cookie toward camera
+    cookieGrp.position.set(px, py, pz);
     cookieGrp.lookAt(0,0,0);
-    cookieGrp.rotation.x+=Math.PI/2; // lay flat
-    cookieGrp.rotation.z=sr()*0.5;
+    cookieGrp.rotation.x += Math.PI / 2;
+    cookieGrp.rotation.z = sr() * 0.5;
 
-    S.cookie={yaw,pitch,dist,origin:new THREE.Vector3(px,py,pz),health:100,cuts:0,scratches:0};
-    S.approach=1.0;
+    S.cookie = { yaw, pitch, dist, origin: new THREE.Vector3(px, py, pz), health: 100, cuts: 0, scratches: 0 };
+    S.approach = 1.0;
 
     scene.add(cookieGrp);
 
-    // DoF blur sphere
-    dofBlurSphere=makeBlurSphere();
+    dofBlurSphere = makeBlurSphere();
     dofBlurSphere.position.copy(cookieGrp.position);
     scene.add(dofBlurSphere);
 
+    els.cookieHp.classList.remove('show');
     updateHUD();
   }
 
-  // Swipe canvas
-  const sCtx=swipeCv.getContext('2d');
-  function resizeSwipe(){swipeCv.width=innerWidth;swipeCv.height=innerHeight}
-  function drawTrail(){
-    sCtx.clearRect(0,0,swipeCv.width,swipeCv.height);
-    if(!S.touch.on||S.touch.pts.length<2)return;
-    const pts=S.touch.pts;
-    sCtx.beginPath();sCtx.moveTo(pts[0].x,pts[0].y);
-    for(let i=1;i<pts.length;i++){const p=pts[i-1],c=pts[i];sCtx.quadraticCurveTo(p.x,p.y,(p.x+c.x)/2,(p.y+c.y)/2)}
-    if(S.tool==='knife'){sCtx.strokeStyle='rgba(240,240,250,0.9)';sCtx.lineWidth=3;sCtx.shadowColor='rgba(255,255,255,0.8)';sCtx.shadowBlur=15}
-    else{sCtx.strokeStyle='rgba(245,166,35,0.7)';sCtx.lineWidth=8;sCtx.lineCap='round';sCtx.shadowColor='rgba(245,166,35,0.4)';sCtx.shadowBlur=10;sCtx.setLineDash([4,8])}
-    sCtx.stroke();sCtx.setLineDash([]);sCtx.shadowBlur=0;
+  // Cap damage FX per cookie — recycle oldest when over CONFIG.cookieMaxFx
+  function pushCookieFx(mesh){
+    if (!cookieGrp) return;
+    cookieGrp.add(mesh);
+    const q = cookieGrp.userData.fxQueue;
+    q.push(mesh);
+    while (q.length > CONFIG.cookieMaxFx){
+      const old = q.shift();
+      cookieGrp.remove(old);
+      if (old.geometry) old.geometry.dispose();
+      if (old.material) old.material.dispose();
+    }
   }
 
-  // Camera
+  // ═══════════════════════════════════════
+  //  SWIPE TRAIL
+  // ═══════════════════════════════════════
+  const sCtx = els.swipeCv.getContext('2d');
+  function resizeSwipe(){ els.swipeCv.width = innerWidth; els.swipeCv.height = innerHeight }
+  function swipePush(x, y){
+    // ring buffer over CONFIG.swipeMaxPts
+    const max = CONFIG.swipeMaxPts;
+    if (S.swipe.pts.length < max){
+      S.swipe.pts.push({x,y});
+      S.swipe.head = S.swipe.pts.length % max;
+    } else {
+      S.swipe.pts[S.swipe.head] = {x,y};
+      S.swipe.head = (S.swipe.head + 1) % max;
+    }
+  }
+  function swipePts(){
+    if (S.swipe.pts.length < CONFIG.swipeMaxPts) return S.swipe.pts;
+    // unroll ring buffer in order
+    const out = [];
+    for (let i=0;i<CONFIG.swipeMaxPts;i++) out.push(S.swipe.pts[(S.swipe.head + i) % CONFIG.swipeMaxPts]);
+    return out;
+  }
+  function swipeLastTwo(){
+    const n = S.swipe.pts.length;
+    if (n === 0) return [null, null];
+    if (n < CONFIG.swipeMaxPts){
+      return [n>=2 ? S.swipe.pts[n-2] : null, S.swipe.pts[n-1]];
+    }
+    const last = S.swipe.pts[(S.swipe.head - 1 + CONFIG.swipeMaxPts) % CONFIG.swipeMaxPts];
+    const prev = S.swipe.pts[(S.swipe.head - 2 + CONFIG.swipeMaxPts) % CONFIG.swipeMaxPts];
+    return [prev, last];
+  }
+  function swipeClear(){ S.swipe.pts.length = 0; S.swipe.head = 0 }
+
+  function drawTrail(){
+    sCtx.clearRect(0, 0, els.swipeCv.width, els.swipeCv.height);
+    if (!S.swipe.on) return;
+    const pts = swipePts();
+    if (pts.length < 2) return;
+    sCtx.beginPath();
+    sCtx.moveTo(pts[0].x, pts[0].y);
+    for (let i=1;i<pts.length;i++){
+      const p = pts[i-1], c = pts[i];
+      sCtx.quadraticCurveTo(p.x, p.y, (p.x + c.x)/2, (p.y + c.y)/2);
+    }
+    if (S.tool === 'knife'){
+      sCtx.strokeStyle = 'rgba(240,240,250,0.9)'; sCtx.lineWidth = 3;
+      sCtx.shadowColor = 'rgba(255,255,255,0.8)'; sCtx.shadowBlur = 15;
+    } else {
+      sCtx.strokeStyle = 'rgba(245,166,35,0.7)'; sCtx.lineWidth = 8; sCtx.lineCap = 'round';
+      sCtx.shadowColor = 'rgba(245,166,35,0.4)'; sCtx.shadowBlur = 10;
+      sCtx.setLineDash([4,8]);
+    }
+    sCtx.stroke();
+    sCtx.setLineDash([]);
+    sCtx.shadowBlur = 0;
+  }
+
+  // ═══════════════════════════════════════
+  //  CAMERA / SIM BG
+  // ═══════════════════════════════════════
   async function startCam(){
     try{
       let s;
-      try{s=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}})}
-      catch(e){s=await navigator.mediaDevices.getUserMedia({video:true})}
-      video.srcObject=s;return true;
-    }catch(e){return false}
+      try{
+        s = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment', width:{ideal:1280}, height:{ideal:720} } });
+      } catch(e){
+        devLog('environment camera failed, falling back', e);
+        s = await navigator.mediaDevices.getUserMedia({ video:true });
+      }
+      els.video.srcObject = s;
+      return true;
+    } catch(e){
+      devLog('startCam failed', e);
+      return false;
+    }
   }
 
+  let simRAF = 0;
   function initSimBg(){
-    const el=$('sim-bg'),cv=$('sim-cv');
-    el.classList.add('active');video.style.display='none';
-    const ctx=cv.getContext('2d');cv.width=innerWidth;cv.height=innerHeight;
+    els.simBg.classList.add('active');
+    els.video.style.display = 'none';
+    const ctx = els.simCv.getContext('2d');
+    els.simCv.width = innerWidth;
+    els.simCv.height = innerHeight;
     function draw(t){
-      requestAnimationFrame(draw);
-      // Dark blue gradient with animated grid
-      const grd=ctx.createLinearGradient(0,0,cv.width,cv.height);
-      grd.addColorStop(0,'#0a1628');grd.addColorStop(0.5,'#122040');grd.addColorStop(1,'#0a1228');
-      ctx.fillStyle=grd;ctx.fillRect(0,0,cv.width,cv.height);
-      // Grid
-      ctx.strokeStyle='rgba(100,160,255,0.07)';ctx.lineWidth=1;
-      const gs=50,ox=(t*0.015)%gs,oy=(t*0.01)%gs;
-      for(let x=-gs+ox;x<cv.width+gs;x+=gs){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,cv.height);ctx.stroke()}
-      for(let y=-gs+oy;y<cv.height+gs;y+=gs){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cv.width,y);ctx.stroke()}
-      // Glow dots
-      for(let i=0;i<6;i++){
-        const px=(Math.sin(t*0.0007+i*1.9)*0.35+0.5)*cv.width;
-        const py=(Math.cos(t*0.0005+i*2.7)*0.35+0.5)*cv.height;
-        ctx.beginPath();ctx.arc(px,py,3+Math.sin(t*0.002+i)*2,0,Math.PI*2);
-        ctx.fillStyle=`rgba(100,160,255,${0.2+Math.sin(t*0.003+i)*0.1})`;ctx.fill();
+      simRAF = requestAnimationFrame(draw);
+      const cv = els.simCv;
+      const grd = ctx.createLinearGradient(0, 0, cv.width, cv.height);
+      grd.addColorStop(0, '#0a1628'); grd.addColorStop(0.5, '#122040'); grd.addColorStop(1, '#0a1228');
+      ctx.fillStyle = grd; ctx.fillRect(0, 0, cv.width, cv.height);
+      ctx.strokeStyle = 'rgba(100,160,255,0.07)'; ctx.lineWidth = 1;
+      const gs = 50, ox = (t*0.015)%gs, oy = (t*0.01)%gs;
+      for (let x=-gs+ox;x<cv.width+gs;x+=gs){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,cv.height); ctx.stroke() }
+      for (let y=-gs+oy;y<cv.height+gs;y+=gs){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(cv.width,y); ctx.stroke() }
+      for (let i=0;i<6;i++){
+        const px = (Math.sin(t*0.0007 + i*1.9)*0.35 + 0.5)*cv.width;
+        const py = (Math.cos(t*0.0005 + i*2.7)*0.35 + 0.5)*cv.height;
+        ctx.beginPath(); ctx.arc(px, py, 3 + Math.sin(t*0.002 + i)*2, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(100,160,255,${0.2 + Math.sin(t*0.003 + i)*0.1})`;
+        ctx.fill();
       }
     }
-    requestAnimationFrame(draw);
+    simRAF = requestAnimationFrame(draw);
   }
 
-  // Gyro
-  let gyroBase=null;
+  // ═══════════════════════════════════════
+  //  ORIENTATION (gyro)
+  // ═══════════════════════════════════════
+  let gyroBase = null;
+  function captureGyroBase(e){ gyroBase = { alpha: e.alpha ?? 0, beta: e.beta ?? 0 } }
+  function onGyro(e){
+    if (e.alpha == null) return;
+    if (!gyroBase) captureGyroBase(e);
+    S.yaw = -(e.alpha - gyroBase.alpha) * Math.PI / 180;
+    S.pitch = Math.max(-1.2, Math.min(1.2, -((e.beta ?? 0) - gyroBase.beta - 45) * Math.PI / 180 * 0.5));
+  }
   function initGyro(){
-    if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function')
-      DeviceOrientationEvent.requestPermission().then(r=>{if(r==='granted')window.addEventListener('deviceorientation',onGyro)}).catch(()=>{});
-    else window.addEventListener('deviceorientation',onGyro);
-
-    // Touch drag (single finger, no tool) = pan
-    let drag=null;
-    interact.addEventListener('touchstart',e=>{if(S.tool||e.touches.length>1)return;drag={x:e.touches[0].clientX,y:e.touches[0].clientY,yaw:S.yaw,pitch:S.pitch}});
-    interact.addEventListener('touchmove',e=>{if(!drag||S.tool||e.touches.length>1)return;S.yaw=drag.yaw+(e.touches[0].clientX-drag.x)*0.005;S.pitch=Math.max(-1,Math.min(1,drag.pitch-(e.touches[0].clientY-drag.y)*0.005))});
-    interact.addEventListener('touchend',e=>{if(e.touches.length===0)drag=null});
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){
+      DeviceOrientationEvent.requestPermission()
+        .then(r => { if (r === 'granted') window.addEventListener('deviceorientation', onGyro) })
+        .catch(err => devLog('deviceorientation permission denied', err));
+    } else {
+      window.addEventListener('deviceorientation', onGyro);
+    }
+    // Re-baseline on orientation change so portrait <-> landscape doesn't drift
+    window.addEventListener('orientationchange', ()=>{ gyroBase = null });
   }
-  function onGyro(e){if(e.alpha===null)return;if(!gyroBase)gyroBase={alpha:e.alpha,beta:e.beta};S.yaw=-(e.alpha-gyroBase.alpha)*Math.PI/180;S.pitch=Math.max(-1.2,Math.min(1.2,-(e.beta-(gyroBase.beta||0)-45)*Math.PI/180*0.5))}
-
-  // Pinch-to-approach
-  interact.addEventListener('touchstart',e=>{if(e.touches.length===2){S.pinchOn=true;S.pinchD=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY)}},{passive:true});
-  interact.addEventListener('touchmove',e=>{if(S.pinchOn&&e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);S.approach=Math.max(0,Math.min(1,S.approach-(d/S.pinchD-1)*0.02));S.pinchD=d}},{passive:true});
-  interact.addEventListener('touchend',e=>{if(e.touches.length<2)S.pinchOn=false},{passive:true});
-
-  stepper.onStep=()=>{if(S.cookie&&!S.inRange){S.approach=Math.max(0,S.approach-0.05);if(navigator.vibrate)navigator.vibrate(15)}};
 
   // ═══════════════════════════════════════
-  //  MOUSE CONTROLS (desktop)
+  //  TOUCH PAN (single-finger, no tool)
   // ═══════════════════════════════════════
-  let mDrag={on:false,sx:0,sy:0,syaw:0,sp:0};
-  interact.addEventListener('mousedown',e=>{
-    if(e.button===2||(e.button===0&&!S.tool)){mDrag={on:true,sx:e.clientX,sy:e.clientY,syaw:S.yaw,sp:S.pitch}}
-    if(e.button===0&&S.tool&&S.inRange){S.touch.on=true;S.touch.pts=[{x:e.clientX,y:e.clientY}]}
+  function initTouchPan(){
+    let drag = null;
+    els.interact.addEventListener('touchstart', e=>{
+      if (S.tool || e.touches.length !== 1 || S.paused) return;
+      drag = { x:e.touches[0].clientX, y:e.touches[0].clientY, yaw:S.yaw, pitch:S.pitch };
+    });
+    els.interact.addEventListener('touchmove', e=>{
+      if (!drag || S.tool || e.touches.length !== 1) return;
+      S.yaw = drag.yaw + (e.touches[0].clientX - drag.x) * CONFIG.pan.touchSensitivity;
+      S.pitch = Math.max(-1, Math.min(1, drag.pitch - (e.touches[0].clientY - drag.y) * CONFIG.pan.touchSensitivity));
+    });
+    els.interact.addEventListener('touchend', e=>{ if (e.touches.length === 0) drag = null });
+  }
+
+  // ═══════════════════════════════════════
+  //  PINCH-TO-APPROACH
+  // ═══════════════════════════════════════
+  els.interact.addEventListener('touchstart', e=>{
+    if (e.touches.length === 2 && !S.paused){
+      S.pinchOn = true;
+      S.pinchD = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      // Cancel any active single-touch swipe so gestures don't fight
+      if (S.swipe.on){ S.swipe.on = false; swipeClear(); sCtx.clearRect(0,0,els.swipeCv.width,els.swipeCv.height) }
+    }
+  }, { passive:true });
+  els.interact.addEventListener('touchmove', e=>{
+    if (S.pinchOn && e.touches.length === 2){
+      const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      S.approach = Math.max(0, Math.min(1, S.approach - (d/S.pinchD - 1) * CONFIG.approach.pinchScale));
+      S.pinchD = d;
+    }
+  }, { passive:true });
+  els.interact.addEventListener('touchend', e=>{ if (e.touches.length < 2) S.pinchOn = false }, { passive:true });
+
+  stepper.onStep = ()=>{
+    if (S.cookie && !S.inRange && !S.paused){
+      S.approach = Math.max(0, S.approach - CONFIG.approach.stepReduction);
+      if (navigator.vibrate) navigator.vibrate(CONFIG.vibration.step);
+    }
+  };
+
+  // ═══════════════════════════════════════
+  //  DAMAGE APPLICATION (shared by mouse + touch)
+  // ═══════════════════════════════════════
+  function applyDamage(pt){
+    if (S.paused || !S.inRange || !S.cookie || !cookieGrp) return;
+    const [prev, last] = swipeLastTwo();
+    const ref = prev || last;
+    const spd = ref ? Math.hypot(pt.x - ref.x, pt.y - ref.y) : 0;
+    const dmg = S.tool === 'knife' ? spd * CONFIG.damage.knife : spd * CONFIG.damage.fork;
+    S.cookie.health = Math.max(0, S.cookie.health - dmg);
+    if (S.tool === 'knife') cutFx(); else scratchFx();
+    crumbFx(pt);
+    if (S.cookie.health <= 0) catchCookie();
+  }
+
+  // ═══════════════════════════════════════
+  //  MOUSE CONTROLS
+  // ═══════════════════════════════════════
+  const mDrag = { on:false, sx:0, sy:0, syaw:0, sp:0 };
+  els.interact.addEventListener('mousedown', e=>{
+    if (S.paused) return;
+    if (e.button === 2 || (e.button === 0 && !S.tool)){
+      mDrag.on = true; mDrag.sx = e.clientX; mDrag.sy = e.clientY; mDrag.syaw = S.yaw; mDrag.sp = S.pitch;
+    }
+    if (e.button === 0 && S.tool && S.inRange){
+      S.swipe.on = true; S.swipe.source = 'mouse'; swipeClear(); swipePush(e.clientX, e.clientY);
+    }
   });
-  interact.addEventListener('mousemove',e=>{
-    if(mDrag.on){S.yaw=mDrag.syaw+(e.clientX-mDrag.sx)*0.003;S.pitch=Math.max(-1,Math.min(1,mDrag.sp-(e.clientY-mDrag.sy)*0.003))}
-    if(S.touch.on&&S.tool){
-      const pt={x:e.clientX,y:e.clientY};
-      S.touch.pts.push(pt);if(S.touch.pts.length>60)S.touch.pts.shift();
-      if(S.inRange&&S.cookie){
-        const prev=S.touch.pts[S.touch.pts.length-2];
-        const spd=prev?Math.hypot(pt.x-prev.x,pt.y-prev.y):0;
-        const dmg=S.tool==='knife'?spd*0.15:spd*0.1;
-        S.cookie.health=Math.max(0,S.cookie.health-dmg);
-        if(cookieGrp){S.tool==='knife'?cutFx(pt):scratchFx(pt);crumbFx(pt)}
-        if(S.cookie.health<=0)catchCookie();
-      }
+  els.interact.addEventListener('mousemove', e=>{
+    if (mDrag.on){
+      S.yaw = mDrag.syaw + (e.clientX - mDrag.sx) * CONFIG.pan.mouseSensitivity;
+      S.pitch = Math.max(-1, Math.min(1, mDrag.sp - (e.clientY - mDrag.sy) * CONFIG.pan.mouseSensitivity));
+    }
+    if (S.swipe.on && S.swipe.source === 'mouse' && S.tool && !S.paused){
+      const pt = { x:e.clientX, y:e.clientY };
+      swipePush(pt.x, pt.y);
+      applyDamage(pt);
       drawTrail();
     }
   });
-  interact.addEventListener('mouseup',()=>{mDrag.on=false;if(S.touch.on){S.touch.on=false;S.touch.pts=[];setTimeout(()=>sCtx.clearRect(0,0,swipeCv.width,swipeCv.height),200)}});
-  interact.addEventListener('contextmenu',e=>e.preventDefault());
-  interact.addEventListener('wheel',e=>{e.preventDefault();S.approach=Math.max(0,Math.min(1,S.approach+e.deltaY*0.001))},{passive:false});
+  els.interact.addEventListener('mouseup', ()=>{
+    mDrag.on = false;
+    if (S.swipe.on && S.swipe.source === 'mouse'){
+      S.swipe.on = false; swipeClear();
+      setTimeout(()=> sCtx.clearRect(0, 0, els.swipeCv.width, els.swipeCv.height), 200);
+    }
+  });
+  els.interact.addEventListener('contextmenu', e=> e.preventDefault());
+  els.interact.addEventListener('wheel', e=>{
+    if (S.paused) return;
+    e.preventDefault();      // intentional: #interact is full-viewport so we own scroll while playing
+    S.approach = Math.max(0, Math.min(1, S.approach + e.deltaY * CONFIG.approach.wheelStep));
+  }, { passive:false });
 
-  window.addEventListener('keydown',e=>{
-    if(e.key==='1')selTool('knife');
-    else if(e.key==='2')selTool('fork');
-    else if(e.key==='w'||e.key==='W')S.approach=Math.max(0,S.approach-0.04);
-    else if(e.key==='s'||e.key==='S')S.approach=Math.min(1,S.approach+0.04);
-    else if(e.key==='Escape'){S.tool=null;tKnife.classList.remove('active');tFork.classList.remove('active')}
+  window.addEventListener('keydown', e=>{
+    if (e.key === '1') selTool('knife');
+    else if (e.key === '2') selTool('fork');
+    else if (e.key === 'w' || e.key === 'W') S.approach = Math.max(0, S.approach - CONFIG.approach.keyStep);
+    else if (e.key === 's' || e.key === 'S') S.approach = Math.min(1, S.approach + CONFIG.approach.keyStep);
+    else if (e.key === 'Escape'){ S.tool = null; setToolActive(null) }
   });
 
   // ═══════════════════════════════════════
   //  TOOLS
   // ═══════════════════════════════════════
-  tKnife.addEventListener('click',()=>selTool('knife'));
-  tFork.addEventListener('click',()=>selTool('fork'));
+  els.tKnife.addEventListener('click', ()=> selTool('knife'));
+  els.tFork.addEventListener('click', ()=> selTool('fork'));
+  function setToolActive(t){
+    els.tKnife.classList.toggle('active', t === 'knife');
+    els.tFork.classList.toggle('active',  t === 'fork');
+    els.tKnife.setAttribute('aria-pressed', String(t === 'knife'));
+    els.tFork.setAttribute('aria-pressed',  String(t === 'fork'));
+  }
   function selTool(t){
-    if(S.tool===t){S.tool=null;tKnife.classList.remove('active');tFork.classList.remove('active');showToast('Tool deselected');return}
-    S.tool=t;tKnife.classList.toggle('active',t==='knife');tFork.classList.toggle('active',t==='fork');
-    if(navigator.vibrate)navigator.vibrate(30);showToast(t==='knife'?'🔪 Knife — swipe to cut!':'🍴 Fork — scratch to catch!');
+    if (S.tool === t){
+      S.tool = null; setToolActive(null);
+      showToast('Tool deselected');
+      return;
+    }
+    S.tool = t; setToolActive(t);
+    if (navigator.vibrate) navigator.vibrate(CONFIG.vibration.tool);
+    showToast(t === 'knife' ? '🔪 Knife — swipe to cut!' : '🍴 Fork — scratch to catch!');
   }
 
-  // Touch tool interaction
-  interact.addEventListener('touchstart',e=>{if(!S.tool||!S.inRange||e.touches.length!==1)return;e.preventDefault();S.touch.on=true;S.touch.pts=[{x:e.touches[0].clientX,y:e.touches[0].clientY}]},{passive:false});
-  interact.addEventListener('touchmove',e=>{
-    if(!S.touch.on||!S.tool||e.touches.length!==1)return;e.preventDefault();
-    const pt={x:e.touches[0].clientX,y:e.touches[0].clientY};
-    S.touch.pts.push(pt);if(S.touch.pts.length>60)S.touch.pts.shift();
-    if(S.inRange&&S.cookie){
-      const prev=S.touch.pts[S.touch.pts.length-2];
-      const spd=prev?Math.hypot(pt.x-prev.x,pt.y-prev.y):0;
-      const dmg=S.tool==='knife'?spd*0.15:spd*0.1;
-      S.cookie.health=Math.max(0,S.cookie.health-dmg);
-      if(cookieGrp){S.tool==='knife'?cutFx(pt):scratchFx(pt);crumbFx(pt)}
-      if(navigator.vibrate)navigator.vibrate(10);
-      if(S.cookie.health<=0)catchCookie();
-    }
+  // ═══════════════════════════════════════
+  //  TOUCH TOOL INTERACTION
+  // ═══════════════════════════════════════
+  els.interact.addEventListener('touchstart', e=>{
+    if (!S.tool || !S.inRange || S.paused || e.touches.length !== 1) return;
+    e.preventDefault();
+    S.swipe.on = true; S.swipe.source = 'touch'; swipeClear();
+    swipePush(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive:false });
+  els.interact.addEventListener('touchmove', e=>{
+    if (!S.swipe.on || S.swipe.source !== 'touch' || !S.tool || e.touches.length !== 1) return;
+    e.preventDefault();
+    const pt = { x:e.touches[0].clientX, y:e.touches[0].clientY };
+    swipePush(pt.x, pt.y);
+    applyDamage(pt);
+    if (navigator.vibrate) navigator.vibrate(CONFIG.vibration.hit);
     drawTrail();
-  },{passive:false});
-  interact.addEventListener('touchend',()=>{S.touch.on=false;S.touch.pts=[];setTimeout(()=>sCtx.clearRect(0,0,swipeCv.width,swipeCv.height),200)});
+  }, { passive:false });
+  els.interact.addEventListener('touchend', ()=>{
+    if (S.swipe.on && S.swipe.source === 'touch'){
+      S.swipe.on = false; swipeClear();
+      setTimeout(()=> sCtx.clearRect(0, 0, els.swipeCv.width, els.swipeCv.height), 200);
+    }
+  });
 
   // ═══════════════════════════════════════
   //  EFFECTS
   // ═══════════════════════════════════════
-  function cutFx(pt){
-    if(!cookieGrp)return;S.cookie.cuts++;
-    // Glowing slice line
-    const l=new THREE.Mesh(
-      new THREE.PlaneGeometry(0.8,0.012),
-      new THREE.MeshBasicMaterial({color:0xfff8dc,transparent:true,opacity:0.85,side:THREE.DoubleSide})
+  function cutFx(){
+    if (!cookieGrp || !S.cookie) return;
+    S.cookie.cuts++;
+    const l = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.8, 0.012),
+      new THREE.MeshBasicMaterial({ color:0xfff8dc, transparent:true, opacity:0.85, side:THREE.DoubleSide })
     );
-    l.position.y=0.07+S.cookie.cuts*0.003;
-    l.rotation.y=Math.random()*Math.PI;
-    l.rotation.x=Math.PI/2;
-    cookieGrp.add(l);
-    // Shake
-    const orig=cookieGrp.position.clone();
-    cookieGrp.position.x+=(Math.random()-0.5)*0.04;
-    cookieGrp.position.y+=(Math.random()-0.5)*0.04;
-    setTimeout(()=>{if(cookieGrp)cookieGrp.position.copy(orig)},80);
+    l.position.y = 0.07 + (S.cookie.cuts % 8) * 0.003;
+    l.rotation.y = Math.random() * Math.PI;
+    l.rotation.x = Math.PI / 2;
+    pushCookieFx(l);
+    const orig = cookieGrp.position.clone();
+    cookieGrp.position.x += (Math.random() - 0.5) * 0.04;
+    cookieGrp.position.y += (Math.random() - 0.5) * 0.04;
+    setTimeout(()=>{ if (cookieGrp) cookieGrp.position.copy(orig) }, 80);
   }
-  function scratchFx(pt){
-    if(!cookieGrp)return;S.cookie.scratches++;
-    const g=new THREE.Mesh(
-      new THREE.BoxGeometry(0.35,0.006,0.015),
-      new THREE.MeshStandardMaterial({color:0x7A5510,roughness:1})
+  function scratchFx(){
+    if (!cookieGrp || !S.cookie) return;
+    S.cookie.scratches++;
+    const g = new THREE.Mesh(
+      new THREE.BoxGeometry(0.35, 0.006, 0.015),
+      new THREE.MeshStandardMaterial({ color:0x7A5510, roughness:1 })
     );
-    g.position.set((Math.random()-0.5)*0.3,0.065,(Math.random()-0.5)*0.3);
-    g.rotation.y=Math.random()*Math.PI;
-    cookieGrp.add(g);
-    cookieGrp.rotation.z+=(Math.random()-0.5)*0.06;
+    g.position.set((Math.random() - 0.5) * 0.3, 0.065, (Math.random() - 0.5) * 0.3);
+    g.rotation.y = Math.random() * Math.PI;
+    pushCookieFx(g);
+    cookieGrp.rotation.z += (Math.random() - 0.5) * 0.06;
   }
+
+  // Crumb particle pool — throttled emission, single shared rAF in the main loop
+  const crumbs = [];
+  let lastCrumbAt = 0;
   function crumbFx(pt){
-    for(let i=0;i<4;i++){
-      const el=document.createElement('div');el.className='crumb';
-      el.style.left=pt.x+'px';el.style.top=pt.y+'px';
-      const sz=3+Math.random()*7;
-      el.style.width=sz+'px';el.style.height=sz+'px';
-      el.style.background=`hsl(${28+Math.random()*20},${55+Math.random()*35}%,${35+Math.random()*35}%)`;
-      el.style.borderRadius=Math.random()>0.5?'50%':'2px';
+    const now = performance.now();
+    if (now - lastCrumbAt < CONFIG.crumb.minIntervalMs) return;
+    lastCrumbAt = now;
+    for (let i=0;i<CONFIG.crumb.perEmission;i++){
+      const el = document.createElement('div');
+      el.className = 'crumb';
+      const sz = 3 + Math.random() * 7;
+      el.style.left = pt.x + 'px';
+      el.style.top = pt.y + 'px';
+      el.style.width = sz + 'px';
+      el.style.height = sz + 'px';
+      el.style.background = `hsl(${28 + Math.random()*20},${55 + Math.random()*35}%,${35 + Math.random()*35}%)`;
+      el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
       document.body.appendChild(el);
-      const vx=(Math.random()-0.5)*140,vy=-50-Math.random()*90,start=performance.now();
-      (function anim(now){
-        const t=(now-start)/1000;if(t>0.9){el.remove();return}
-        el.style.transform=`translate(${vx*t}px,${vy*t+200*t*t}px) rotate(${t*400}deg)`;
-        el.style.opacity=String(1-t/0.9);requestAnimationFrame(anim);
-      })(performance.now());
+      crumbs.push({
+        el,
+        start: now,
+        vx: (Math.random() - 0.5) * 140,
+        vy: -50 - Math.random() * 90,
+      });
+    }
+  }
+  function stepCrumbs(now){
+    for (let i = crumbs.length - 1; i >= 0; i--){
+      const c = crumbs[i];
+      const t = (now - c.start) / 1000;
+      if (t >= CONFIG.crumb.lifeSec){
+        c.el.remove();
+        crumbs.splice(i, 1);
+        continue;
+      }
+      c.el.style.transform = `translate(${c.vx*t}px,${c.vy*t + 200*t*t}px) rotate(${t*400}deg)`;
+      c.el.style.opacity = String(1 - t / CONFIG.crumb.lifeSec);
     }
   }
 
   // ═══════════════════════════════════════
-  //  CATCH
+  //  CATCH / RESTART
   // ═══════════════════════════════════════
   function catchCookie(){
-    S.caught++;const pr=prizes[S.caught%prizes.length];S.score+=pr.pts;
-    if(navigator.vibrate)navigator.vibrate([50,30,100]);
-    cookieHp.classList.remove('show');
-    // Explode
-    if(cookieGrp){
-      const es=performance.now();
+    S.caught++;
+    const pr = prizes[S.caught % prizes.length];
+    S.score += pr.pts;
+    saveProgress();
+    if (navigator.vibrate) navigator.vibrate(CONFIG.vibration.catch);
+    els.cookieHp.classList.remove('show');
+    if (cookieGrp){
+      const es = performance.now();
+      const grp = cookieGrp;       // capture so the loop doesn't see a reassigned variable
+      const sphere = dofBlurSphere;
       (function ex(now){
-        const t=(now-es)/500;
-        if(t>=1){if(cookieGrp)scene.remove(cookieGrp);if(dofBlurSphere)scene.remove(dofBlurSphere);return}
-        cookieGrp.scale.setScalar(1+t*2.5);
-        cookieGrp.children.forEach(c=>{if(c.material){c.material.transparent=true;c.material.opacity=1-t}});
-        if(dofBlurSphere)dofBlurSphere.material.opacity=0;
+        const t = (now - es) / 500;
+        if (t >= 1){
+          scene.remove(grp); disposeObject3D(grp);
+          if (sphere){ scene.remove(sphere); disposeObject3D(sphere) }
+          return;
+        }
+        grp.scale.setScalar(1 + t * 2.5);
+        grp.children.forEach(c=>{ if (c.material){ c.material.transparent = true; c.material.opacity = 1 - t } });
+        if (sphere) sphere.material.opacity = 0;
         requestAnimationFrame(ex);
       })(performance.now());
+      // Prevent the main loop from continuing to manipulate this group
+      cookieGrp = null;
     }
-    setTimeout(()=>{pIcon.textContent=pr.icon;pTitle.textContent=pr.title;pDesc.textContent=pr.desc;pPts.textContent='+'+pr.pts;prize.classList.add('show')},600);
+    setTimeout(()=>{
+      els.pIcon.textContent = pr.icon;
+      els.pTitle.textContent = pr.title;
+      els.pDesc.textContent = pr.desc;
+      els.pPts.textContent = '+' + pr.pts;
+      // Switch button label on final catch
+      els.pCont.textContent = (S.caught >= S.total) ? 'Play Again' : 'Continue';
+      els.prize.classList.add('show');
+      els.pCont.focus();
+    }, 600);
     updateHUD();
   }
-  pCont.addEventListener('click',()=>{prize.classList.remove('show');if(S.caught<S.total){setTimeout(spawnCookie,500);showToast('🍪 A new cookie appeared!')}else showToast('🎉 All caught! Score: '+S.score)});
 
-  function updateHUD(){sv.textContent=S.score;cv.textContent=`${S.caught} / ${S.total}`}
-  function showToast(m){toast.textContent=m;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2500)}
+  els.pCont.addEventListener('click', ()=>{
+    els.prize.classList.remove('show');
+    if (S.caught < S.total){
+      setTimeout(spawnCookie, 500);
+      showToast('🍪 A new cookie appeared!');
+    } else {
+      // Game over → full reset
+      S.gameOver = true;
+      showToast(`🎉 All caught! Final score: ${S.score}`);
+      setTimeout(()=>{
+        S.runId++;
+        S.caught = 0; S.score = 0;
+        clearProgress();
+        saveProgress();
+        S.gameOver = false;
+        spawnCookie();
+        showToast('🔁 New round started');
+      }, 1500);
+    }
+  });
+
+  function updateHUD(){
+    els.score.textContent = S.score;
+    els.caughtLabel.textContent = `${S.caught} / ${S.total}`;
+  }
+  function showToast(m){
+    els.toast.textContent = m;
+    els.toast.classList.add('show');
+    setTimeout(()=> els.toast.classList.remove('show'), 2500);
+  }
 
   // ═══════════════════════════════════════
   //  GAME LOOP
   // ═══════════════════════════════════════
-  let lt=0;
+  let lt = 0;
   function loop(t){
     requestAnimationFrame(loop);
-    const dt=Math.min((t-lt)/1000,0.1);lt=t;
+    const dt = Math.min((t - lt) / 1000, 0.1); lt = t;
 
-    // Camera
-    cam.rotation.order='YXZ';
-    cam.rotation.y+=(S.yaw-cam.rotation.y)*0.12;
-    cam.rotation.x+=(S.pitch-cam.rotation.x)*0.12;
+    cam.rotation.order = 'YXZ';
+    cam.rotation.y += (S.yaw - cam.rotation.y) * CONFIG.pan.smoothing;
+    cam.rotation.x += (S.pitch - cam.rotation.x) * CONFIG.pan.smoothing;
 
-    if(cookieGrp&&S.cookie){
-      // Gentle rotation
-      cookieGrp.rotation.z+=dt*0.4;
+    if (cookieGrp && S.cookie && !S.gameOver){
+      cookieGrp.rotation.z += dt * 0.4;
 
-      // Move cookie based on approach (slide along its direction vector toward camera)
-      const dir=S.cookie.origin.clone().normalize();
-      const effectiveDist=0.8+S.approach*(S.cookie.dist-0.8);
-      const newPos=dir.multiplyScalar(effectiveDist);
-      newPos.y+=Math.sin(t*0.002)*0.06; // bob
-      cookieGrp.position.lerp(newPos,0.1);
+      // reuse scratch vector for direction
+      _scratchDir.copy(S.cookie.origin).normalize();
+      const effectiveDist = 0.8 + S.approach * (S.cookie.dist - 0.8);
+      _scratchV.copy(_scratchDir).multiplyScalar(effectiveDist);
+      _scratchV.y += Math.sin(t * 0.002) * 0.06;
+      cookieGrp.position.lerp(_scratchV, 0.1);
 
-      // Keep blur sphere on cookie
-      if(dofBlurSphere)dofBlurSphere.position.copy(cookieGrp.position);
+      if (dofBlurSphere) dofBlurSphere.position.copy(cookieGrp.position);
 
-      // Project to screen
-      const proj=cookieGrp.position.clone().project(cam);
-      const onScreen=Math.abs(proj.x)<0.7&&Math.abs(proj.y)<0.7&&proj.z<1&&proj.z>0;
-      const dist3d=cam.position.distanceTo(cookieGrp.position);
+      const proj = cookieGrp.position.clone().project(cam);
+      const onScreen = Math.abs(proj.x) < 0.7 && Math.abs(proj.y) < 0.7 && proj.z < 1 && proj.z > 0;
+      const dist3d = cam.position.distanceTo(cookieGrp.position);
 
-      S.inRange=onScreen&&dist3d<2.5;
+      S.inRange = onScreen && dist3d < CONFIG.inRangeDist && !S.paused;
+      els.xhair.classList.toggle('near', S.inRange);
 
-      xhair.classList.toggle('near',S.inRange);
-
-      // Cookie health bar
-      if(S.inRange&&S.cookie.health<100){
-        cookieHp.classList.add('show');
-        hpFill.style.width=S.cookie.health+'%';
-        hpFill.style.background=S.cookie.health>50?'var(--gold)':S.cookie.health>25?'#e67e22':'var(--red)';
-      }else if(S.cookie.health>=100){cookieHp.classList.remove('show')}
-
-      // Scale cookie — bigger as you get closer
-      const healthScale=0.6+(S.cookie.health/100)*0.4;
-      const approachScale=0.6+(1-S.approach)*1.0;
-      const ts=approachScale*healthScale;
-      cookieGrp.scale.lerp(new THREE.Vector3(ts,ts,ts),0.08);
-
-      // ─── DoF SIMULATION ───
-      // Blur sphere: visible when far, invisible when close
-      if(dofBlurSphere){
-        const blurOpacity=S.inRange?0:Math.min(0.35,S.approach*0.4);
-        dofBlurSphere.material.opacity+=(blurOpacity-dofBlurSphere.material.opacity)*0.1;
-        dofBlurSphere.scale.setScalar(ts*2.5);
-        // Color shifts with distance
-        const c=new THREE.Color();
-        c.setHSL(0.6,0.15,0.5+S.approach*0.2);
-        dofBlurSphere.material.color=c;
+      // HP bar: show whenever the cookie has taken damage; auto-hides on a fresh spawn
+      if (S.cookie.health < 100){
+        els.cookieHp.classList.add('show');
+        els.hpFill.style.width = S.cookie.health + '%';
+        els.hpFill.style.background = S.cookie.health > 50 ? 'var(--gold)' : S.cookie.health > 25 ? '#e67e22' : 'var(--red)';
+      } else {
+        els.cookieHp.classList.remove('show');
       }
 
-      // Cookie material adjustments for DoF feel
-      cookieGrp.children.forEach(child=>{
-        if(child.material&&child.material.isMeshStandardMaterial){
-          // Slightly desaturate/darken when far
-          const targetRough=S.inRange?child.material.userData.origRough||0.8:0.95;
-          child.material.roughness+=(targetRough-child.material.roughness)*0.05;
-          if(!child.material.userData.origRough)child.material.userData.origRough=child.material.roughness;
-        }
-      });
+      const healthScale = 0.6 + (S.cookie.health / 100) * 0.4;
+      const approachScale = 0.6 + (1 - S.approach) * 1.0;
+      const ts = approachScale * healthScale;
+      _scratchV.set(ts, ts, ts);
+      cookieGrp.scale.lerp(_scratchV, 0.08);
 
-      // Direction arrow for off-screen cookie
-      if(!onScreen){
-        darrow.classList.add('show');
-        const angle=Math.atan2(proj.y,proj.x);
-        const cx=innerWidth/2,cy=innerHeight/2,er=Math.min(cx,cy)*0.65;
-        darrow.style.left=(cx+Math.cos(angle)*er-22)+'px';
-        darrow.style.top=(cy-Math.sin(angle)*er-22)+'px';
-        darrow.style.transform=`rotate(${-angle+Math.PI/2}rad)`;
-      }else darrow.classList.remove('show');
+      if (dofBlurSphere){
+        const blurOpacity = S.inRange ? 0 : Math.min(0.35, S.approach * 0.4);
+        dofBlurSphere.material.opacity += (blurOpacity - dofBlurSphere.material.opacity) * 0.1;
+        dofBlurSphere.scale.setScalar(ts * 2.5);
+        dofBlurSphere.material.color.setHSL(0.6, 0.15, 0.5 + S.approach * 0.2);
+      }
 
-      radar.classList.toggle('hidden',onScreen);
+      if (!onScreen){
+        els.darrow.classList.add('show');
+        const angle = Math.atan2(proj.y, proj.x);
+        const cx = innerWidth / 2, cy = innerHeight / 2, er = Math.min(cx, cy) * 0.65;
+        els.darrow.style.left = (cx + Math.cos(angle) * er - 22) + 'px';
+        els.darrow.style.top = (cy - Math.sin(angle) * er - 22) + 'px';
+        els.darrow.style.transform = `rotate(${-angle + Math.PI/2}rad)`;
+      } else {
+        els.darrow.classList.remove('show');
+      }
 
-      // Distance bar + approach indicator
-      const pct=Math.max(0,Math.min(100,(1-S.approach)*100));
-      dfill.style.height=pct+'%';
-      approachEl.classList.toggle('show',onScreen&&!S.inRange);
-      afill.style.width=pct+'%';
-      apct.textContent=Math.round(pct)+'%';
+      els.radar.classList.toggle('hidden', onScreen);
+
+      const pct = Math.max(0, Math.min(100, (1 - S.approach) * 100));
+      els.dfill.style.height = pct + '%';
+      els.approach.classList.toggle('show', onScreen && !S.inRange);
+      els.afill.style.width = pct + '%';
+      els.apct.textContent = Math.round(pct) + '%';
     }
 
-    renderer.render(scene,cam);
+    stepCrumbs(t);
+    renderer.render(scene, cam);
   }
 
   function onResize(){
-    cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();
-    renderer.setSize(innerWidth,innerHeight);resizeSwipe();
-    const sc=$('sim-cv');if(sc){sc.width=innerWidth;sc.height=innerHeight}
+    if (!renderer || !cam) return;     // resize can fire before initThree
+    cam.aspect = innerWidth / innerHeight;
+    cam.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+    resizeSwipe();
+    if (els.simCv){ els.simCv.width = innerWidth; els.simCv.height = innerHeight }
   }
-  window.addEventListener('resize',onResize);
+  window.addEventListener('resize', onResize);
 
   // ═══════════════════════════════════════
   //  START
   // ═══════════════════════════════════════
-  startBtn.addEventListener('click',async()=>{
-    startBtn.textContent='Initializing...';startBtn.disabled=true;
-    const camOk=await startCam();
-    if(!camOk){devMode=true;initSimBg();console.log('%c🍪 DEV MODE','color:#F5A623;font-size:14px')}
-    if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function')try{await DeviceMotionEvent.requestPermission()}catch(e){}
-    startGPS();stepper.init();
-    gate.classList.add('hidden');game.classList.add('active');
-    if(isDesktop||devMode){$('dev-banner').classList.add('show');$('dhelp').classList.add('show');$('ghint').style.display='none'}
-    resizeSwipe();initThree();initGyro();onResize();requestAnimationFrame(loop);
-    showToast(devMode?'⚙ Dev mode — drag to pan, scroll to approach':'🍪 Find the cookie!');updateHUD();
+  loadProgress();
+  if (S.caught > 0 || S.score > 0) updateHUD();
+
+  els.startBtn.addEventListener('click', async ()=>{
+    els.startBtn.textContent = 'Initializing...';
+    els.startBtn.disabled = true;
+    const camOk = await startCam();
+    if (!camOk){ devMode = true; initSimBg(); console.log('%c🍪 DEV MODE','color:#F5A623;font-size:14px') }
+    if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function'){
+      try{
+        const r = await DeviceMotionEvent.requestPermission();
+        if (r !== 'granted') devLog('devicemotion permission not granted; step detector disabled');
+        else stepper.init();
+      } catch(e){ devLog('devicemotion permission error', e) }
+    } else {
+      stepper.init();
+    }
+    startGPS();
+    els.gate.classList.add('hidden');
+    els.game.classList.add('active');
+    if (isDesktop || devMode){
+      els.devBanner.classList.add('show');
+      els.dhelp.classList.add('show');
+      els.ghint.style.display = 'none';
+    }
+    resizeSwipe();
+    initThree();
+    initGyro();
+    initTouchPan();
+    onResize();
+    requestAnimationFrame(loop);
+    showToast(devMode ? '⚙ Dev mode — drag to pan, scroll to approach' : '🍪 Find the cookie!');
+    updateHUD();
   });
 
-  // GPS status
-  if(ZONE.lat){
-    gpsStatus.textContent='📍 GPS-locked zone';
-    navigator.geolocation?.getCurrentPosition(p=>{
-      const d=haversine(p.coords.latitude,p.coords.longitude,ZONE.lat,ZONE.lng);
-      if(d>ZONE.radius){gpsStatus.textContent=`⚠️ ${Math.round(d)}m away`;gpsStatus.style.color='#E74C3C'}
-      else{gpsStatus.textContent=`✅ Inside zone (${Math.round(d)}m)`;gpsStatus.style.color='#2ECC71'}
-    },()=>{gpsStatus.textContent='⚠️ Location unavailable'});
-  }else gpsStatus.textContent='ℹ️ No GPS lock — open anywhere';
+  // GPS pre-flight on gate
+  if (ZONE.lat != null){
+    els.gpsStatus.textContent = '📍 GPS-locked zone';
+    navigator.geolocation?.getCurrentPosition(
+      p => {
+        const d = haversine(p.coords.latitude, p.coords.longitude, ZONE.lat, ZONE.lng);
+        if (d > ZONE.radius){
+          els.gpsStatus.textContent = `⚠️ ${Math.round(d)}m away`;
+          els.gpsStatus.style.color = '#E74C3C';
+        } else {
+          els.gpsStatus.textContent = `✅ Inside zone (${Math.round(d)}m)`;
+          els.gpsStatus.style.color = '#2ECC71';
+        }
+      },
+      err => { els.gpsStatus.textContent = '⚠️ Location unavailable'; devLog('pre-flight gps error', err) }
+    );
+  } else {
+    els.gpsStatus.textContent = 'ℹ️ No GPS lock — open anywhere';
+  }
 })();
 </script>
 </body>

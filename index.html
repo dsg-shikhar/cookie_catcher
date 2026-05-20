@@ -10,382 +10,334 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { overflow: hidden; background: #000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; touch-action: none; }
 
-        /* Camera Feed Layer */
         #camera-feed {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover; z-index: 0; background: #111;
-            display: none;
+            object-fit: cover; z-index: 0; background: #111; display: none;
         }
 
-        /* Three.js Canvas Layer */
         #canvas-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1; pointer-events: none;
+            z-index: 1;
         }
         #canvas-container canvas { display: block; width: 100%; height: 100%; }
 
-        /* UI Layer */
         #ui-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 2; pointer-events: none;
             display: flex; flex-direction: column;
-            justify-content: space-between; padding: 20px;
+            justify-content: space-between; padding: 16px;
         }
 
         /* Reticle */
         #reticle {
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 60px; height: 60px;
-            border: 3px solid rgba(255, 255, 255, 0.6);
+            width: 50px; height: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
             border-radius: 50%;
-            box-shadow: 0 0 20px rgba(255,255,255,0.2), inset 0 0 10px rgba(255,255,255,0.1);
-            transition: all 0.15s ease;
+            box-shadow: 0 0 15px rgba(255,255,255,0.15);
+            transition: all 0.1s ease;
             pointer-events: none;
         }
         #reticle::before {
             content: ''; position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 4px; height: 4px; background: rgba(255,255,255,0.9);
+            width: 3px; height: 3px; background: rgba(255,255,255,0.8);
             border-radius: 50%;
         }
-        #reticle.targeted {
+        #reticle.charging {
             border-color: #ffd700;
-            box-shadow: 0 0 25px rgba(255,215,0,0.5), inset 0 0 15px rgba(255,215,0,0.2);
-            width: 80px; height: 80px;
-        }
-        #reticle.locked {
-            border-color: #ff6b6b;
-            box-shadow: 0 0 30px rgba(255,107,107,0.6);
-            width: 100px; height: 100px;
+            box-shadow: 0 0 20px rgba(255,215,0,0.4);
+            width: 70px; height: 70px;
         }
 
         /* HUD */
         .hud-panel {
-            background: rgba(15, 15, 30, 0.7);
-            color: #fff; padding: 12px 20px;
-            border-radius: 16px; font-size: 16px; font-weight: 600;
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            display: flex; gap: 20px; align-items: center; pointer-events: auto;
+            background: rgba(15, 15, 30, 0.65);
+            color: #fff; padding: 10px 16px;
+            border-radius: 14px; font-size: 15px; font-weight: 600;
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex; gap: 16px; align-items: center; pointer-events: auto;
         }
-        .hud-panel .label { color: #a0a0b0; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
-        .hud-panel .value { color: #ffd700; font-size: 26px; font-weight: 700; }
-        .hud-panel .combo { color: #ff6b6b; font-size: 13px; opacity: 0; transition: opacity 0.3s; }
+        .hud-panel .label { color: #888; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .hud-panel .value { color: #ffd700; font-size: 24px; font-weight: 700; }
+        .hud-panel .combo { color: #ff6b6b; font-size: 12px; opacity: 0; transition: opacity 0.3s; }
         .hud-panel .combo.active { opacity: 1; }
 
         /* Power Bar */
         #power-bar-container {
-            position: absolute; left: 50%; bottom: 120px;
-            transform: translateX(-50%); width: 220px; height: 8px;
-            background: rgba(255,255,255,0.15); border-radius: 4px;
+            position: absolute; left: 50%; bottom: 110px;
+            transform: translateX(-50%); width: 200px; height: 6px;
+            background: rgba(255,255,255,0.12); border-radius: 3px;
             display: none; pointer-events: none; overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
         #power-bar-fill {
-            height: 100%; width: 0%; background: linear-gradient(90deg, #00ff88, #ffd700, #ff6b6b);
-            border-radius: 4px; transition: width 0.05s linear;
+            height: 100%; width: 0%; background: linear-gradient(90deg, #00ff88, #ffd700, #ff4757);
+            border-radius: 3px; transition: width 0.04s linear;
         }
 
         /* Messages */
         #message-overlay {
-            position: absolute; top: 38%; left: 50%;
+            position: absolute; top: 35%; left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 52px; font-weight: 800;
-            text-shadow: 0 4px 12px rgba(0,0,0,0.6), 0 0 40px rgba(255,255,255,0.2);
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.2s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            white-space: nowrap; text-align: center;
+            font-size: 48px; font-weight: 800;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.6), 0 0 30px rgba(255,255,255,0.15);
+            opacity: 0; pointer-events: none; text-align: center;
+            transition: opacity 0.15s, transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        #message-overlay.show { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-        #message-overlay .sub { font-size: 18px; font-weight: 500; margin-top: 8px; opacity: 0.9; }
+        #message-overlay.show { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+        #message-overlay .sub { font-size: 16px; font-weight: 500; margin-top: 6px; opacity: 0.85; }
 
-        /* Permission / Landing Gate */
+        /* Phase indicator */
+        #phase-badge {
+            position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.5); padding: 5px 14px; border-radius: 16px;
+            font-size: 11px; font-weight: 700; color: #ffd700;
+            letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.7;
+        }
+
+        /* Reset button */
+        #reset-btn {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff; border: 2px solid rgba(255,255,255,0.3);
+            padding: 14px 28px; border-radius: 30px; font-size: 16px;
+            font-weight: 700; cursor: pointer; backdrop-filter: blur(8px);
+            display: none; pointer-events: auto; z-index: 10;
+            transition: all 0.2s;
+        }
+        #reset-btn:hover { background: rgba(255,215,0,0.2); border-color: #ffd700; }
+
+        /* Permission Gate */
         #permission-gate {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 100; background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
+            z-index: 100; background: linear-gradient(160deg, #0a0a1a 0%, #1a1a2e 50%, #0f0f1e 100%);
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            padding: 30px; text-align: center; color: #fff;
+            padding: 24px; text-align: center; color: #fff;
             pointer-events: auto;
         }
         #permission-gate h1 {
-            font-size: 36px; font-weight: 800; margin-bottom: 12px;
+            font-size: 34px; font-weight: 800; margin-bottom: 10px;
             background: linear-gradient(90deg, #ffd700, #ff6b6b);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        #permission-gate p { color: #a0a0b0; font-size: 16px; line-height: 1.6; max-width: 320px; margin-bottom: 30px; }
-        .btn {
-            background: linear-gradient(90deg, #ffd700, #ffaa00);
-            color: #0f0f1e; border: none; padding: 16px 40px;
-            font-size: 18px; font-weight: 700; border-radius: 30px;
-            cursor: pointer; box-shadow: 0 4px 20px rgba(255,215,0,0.3);
-            transition: transform 0.2s, box-shadow 0.2s;
-            pointer-events: auto;
+        #permission-gate p { color: #999; font-size: 15px; line-height: 1.6; max-width: 320px; margin-bottom: 24px; }
+        .mode-card {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px; padding: 20px; margin-bottom: 12px;
+            width: 100%; max-width: 340px; cursor: pointer;
+            transition: all 0.2s; text-align: left;
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(255,215,0,0.4); }
-        .btn:active { transform: translateY(0); }
-        .btn.secondary {
-            background: rgba(255,255,255,0.1); color: #fff;
-            box-shadow: none; margin-top: 12px; font-size: 14px; padding: 12px 24px;
+        .mode-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,215,0,0.3); }
+        .mode-card .mode-title { font-size: 17px; font-weight: 700; color: #ffd700; margin-bottom: 4px; }
+        .mode-card .mode-desc { font-size: 13px; color: #888; line-height: 1.4; }
+        .mode-card .mode-tag {
+            display: inline-block; background: rgba(0,255,136,0.15);
+            color: #00ff88; font-size: 10px; font-weight: 700;
+            padding: 3px 8px; border-radius: 6px; margin-top: 8px;
+            text-transform: uppercase; letter-spacing: 0.5px;
         }
-
-        #status-text { margin-top: 20px; font-size: 13px; color: #666; min-height: 20px; }
-
-        /* Phase indicator */
-        #phase-indicator {
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.5); padding: 6px 16px; border-radius: 20px;
-            font-size: 12px; font-weight: 600; color: #ffd700; letter-spacing: 1px;
-            text-transform: uppercase; opacity: 0.8;
+        .mode-card .mode-tag.fallback {
+            background: rgba(255,170,0,0.15); color: #ffaa00;
         }
+        #status-text { margin-top: 16px; font-size: 13px; color: #666; min-height: 20px; }
 
         .hidden { display: none !important; }
-        .fade-out { opacity: 0; pointer-events: none; transition: opacity 0.5s; }
+        .fade-out { opacity: 0; pointer-events: none; transition: opacity 0.4s; }
     </style>
 <base target="_blank">
 </head>
 <body>
-    <!-- Camera Feed -->
     <video id="camera-feed" autoplay playsinline muted></video>
-
-    <!-- Three.js Container -->
     <div id="canvas-container"></div>
 
-    <!-- UI Overlay -->
     <div id="ui-layer">
-        <div id="phase-indicator">Explore</div>
+        <div id="phase-badge">Scan Room</div>
 
         <div class="hud-panel">
-            <div>
-                <div class="label">Score</div>
-                <div class="value" id="score-display">0</div>
-            </div>
-            <div>
-                <div class="label">Cookies</div>
-                <div class="value" id="cookies-display">10</div>
-            </div>
+            <div><div class="label">Score</div><div class="value" id="score-display">0</div></div>
+            <div><div class="label">Cookies</div><div class="value" id="cookies-display">10</div></div>
             <div class="combo" id="combo-display">🔥 Combo x1</div>
         </div>
 
-        <div id="message-overlay">
-            <div id="msg-main">DUNK!</div>
-            <div class="sub" id="msg-sub"></div>
-        </div>
-
+        <div id="message-overlay"><div id="msg-main">DUNK!</div><div class="sub" id="msg-sub"></div></div>
         <div id="power-bar-container"><div id="power-bar-fill"></div></div>
-
         <div id="reticle"></div>
+        <button id="reset-btn">↻ Move Tumbler</button>
     </div>
 
-    <!-- Permission Gate -->
     <div id="permission-gate">
         <h1>🍪 Cookie Dunk AR</h1>
-        <p>Scan the room, find floating cookies, and dunk them into the milk tumbler.</p>
-        <button class="btn" id="start-btn">Enter AR Experience</button>
-        <button class="btn secondary" id="skip-gyro-btn">Skip Gyro (Touch Mode)</button>
+        <p>Point your camera, find cookies, swipe to dunk them in milk.</p>
+
+        <div class="mode-card" id="webxr-card">
+            <div class="mode-title">🥽 True AR Mode</div>
+            <div class="mode-desc">Place the milk tumbler on your real table or floor using WebXR surface detection.</div>
+            <div class="mode-tag">Best Experience</div>
+        </div>
+
+        <div class="mode-card" id="fallback-card">
+            <div class="mode-title">📱 Gyro Mode</div>
+            <div class="mode-desc">Pan your phone to find floating cookies. Works on all devices including iPhone.</div>
+            <div class="mode-tag fallback">Universal</div>
+        </div>
+
         <div id="status-text"></div>
     </div>
 
     <script type="importmap">
-    {
-        "imports": {
-            "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
-        }
-    }
+    { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
     </script>
 
     <script type="module">
         import * as THREE from 'three';
 
         // ============================================================
-        // CONFIGURATION & STATE
+        // CONFIGURATION
         // ============================================================
-        const CONFIG = {
-            gravity: -11.0,
-            cookieRadius: 0.18,
-            cookieHeight: 0.06,
-            tumblerRadius: 0.9,
-            tumblerHeight: 2.6,
-            milkLevel: 2.0,
-            maxCookies: 10,
-            poolSize: 5,
-            tumblerBaseZ: -4.5,
-            powerScale: 0.011,
-            upScale: 5.5,
-            sideScale: 0.007,
-            minUpVelocity: 2.2,
-            maxSwipePower: 600,
-            pickupDuration: 0.25,
-            reticleThreshold: 0.22,
-            spawnRadiusMin: 3.5,
-            spawnRadiusMax: 7.5,
-            tumblerExclusion: 2.2
+        const CFG = {
+            gravity: -11.5,
+            cookieRadius: 0.16, cookieHeight: 0.05,
+            tumblerRadius: 0.85, tumblerHeight: 2.4, milkLevel: 1.9,
+            maxCookies: 10, poolSize: 3,
+            powerScale: 0.012, upScale: 5.8, sideScale: 0.007,
+            minUp: 2.3, maxSwipe: 650,
+            spawnNearTumbler: 1.5, spawnHeight: 0.8,
+            resetAfterThrows: 3
         };
 
         const STATE = {
-            phase: 'LANDING', // LANDING, EXPLORE, PICKUP, AIM, THROW, RESOLVE, END
-            score: 0,
-            cookiesLeft: CONFIG.maxCookies,
-            combo: 0,
-            aimStart: { x: 0, y: 0 },
-            aimCurrent: { x: 0, y: 0 },
-            activeCookie: null,
-            pickupProgress: 0,
-            pickupStartPos: new THREE.Vector3(),
-            cookieVelocity: new THREE.Vector3(),
-            cookieSpin: new THREE.Vector3(),
+            mode: 'DETECTING', // DETECTING, WEBXR, FALLBACK, END
+            phase: 'SCAN',     // SCAN, PLACE, THROW, RESOLVE
+            score: 0, cookiesLeft: CFG.maxCookies, combo: 0,
+            throwsSinceReset: 0,
+            aimStart: null, aimCurrent: null,
+            activeCookie: null, cookieVel: new THREE.Vector3(), cookieSpin: new THREE.Vector3(),
+            tumblerPlaced: false, tumblerPos: new THREE.Vector3(0, 0, -3.5),
             gyroEnabled: false,
-            touchPan: { active: false, lastX: 0, lastY: 0 },
-            gameActive: true
+            xrSession: null, xrRefSpace: null, xrHitTestSource: null,
+            touchPan: { active: false, lastX: 0, lastY: 0 }
         };
 
         // ============================================================
-        // DOM REFERENCES
+        // DOM REFS
         // ============================================================
         const videoEl = document.getElementById('camera-feed');
-        const canvasContainer = document.getElementById('canvas-container');
-        const permissionGate = document.getElementById('permission-gate');
-        const startBtn = document.getElementById('start-btn');
-        const skipGyroBtn = document.getElementById('skip-gyro-btn');
+        const gate = document.getElementById('permission-gate');
         const statusText = document.getElementById('status-text');
         const reticle = document.getElementById('reticle');
         const powerBar = document.getElementById('power-bar-container');
         const powerFill = document.getElementById('power-bar-fill');
-        const phaseIndicator = document.getElementById('phase-indicator');
+        const phaseBadge = document.getElementById('phase-badge');
+        const msgOverlay = document.getElementById('message-overlay');
         const msgMain = document.getElementById('msg-main');
         const msgSub = document.getElementById('msg-sub');
-        const msgOverlay = document.getElementById('message-overlay');
+        const resetBtn = document.getElementById('reset-btn');
 
         // ============================================================
-        // THREE.JS CORE SETUP (Transparent AR Overlay)
+        // THREE.JS SETUP
         // ============================================================
         const scene = new THREE.Scene();
-        // No background color — transparent
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 1.5, 0);
 
-        const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 100);
-        camera.position.set(0, 1.6, 0); // Eye level
-
-        const renderer = new THREE.WebGLRenderer({ 
-            antialias: true, 
-            alpha: true,
-            powerPreference: 'high-performance'
-        });
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.shadowMap.enabled = false; // Disable shadows for mobile perf
-        renderer.setClearColor(0x000000, 0); // Fully transparent
-        canvasContainer.appendChild(renderer.domElement);
+        renderer.setClearColor(0x000000, 0);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        // Lighting (subtle, to blend with real world)
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
-        scene.add(ambientLight);
-
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        dirLight.position.set(2, 5, 3);
+        scene.add(new THREE.AmbientLight(0xffffff, 1.0));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+        dirLight.position.set(3, 5, 2);
         scene.add(dirLight);
-
-        const rimLight = new THREE.PointLight(0xffaa88, 0.5, 10);
-        rimLight.position.set(-2, 2, 2);
-        scene.add(rimLight);
 
         // ============================================================
         // OBJECT FACTORIES
         // ============================================================
         function createTumbler() {
-            const group = new THREE.Group();
+            const g = new THREE.Group();
 
             // Glass
-            const glassGeo = new THREE.CylinderGeometry(
-                CONFIG.tumblerRadius, CONFIG.tumblerRadius * 0.82, 
-                CONFIG.tumblerHeight, 24, 1, true
-            );
+            const glassGeo = new THREE.CylinderGeometry(CFG.tumblerRadius, CFG.tumblerRadius * 0.8, CFG.tumblerHeight, 24, 1, true);
             const glassMat = new THREE.MeshPhysicalMaterial({
-                color: 0xffffff, metalness: 0, roughness: 0.1,
-                transmission: 0.9, thickness: 0.08,
-                transparent: true, opacity: 0.2,
+                color: 0xffffff, metalness: 0, roughness: 0.08,
+                transmission: 0.92, thickness: 0.06,
+                transparent: true, opacity: 0.18,
                 side: THREE.DoubleSide, ior: 1.45
             });
             const glass = new THREE.Mesh(glassGeo, glassMat);
-            glass.position.y = CONFIG.tumblerHeight / 2;
-            group.add(glass);
+            glass.position.y = CFG.tumblerHeight / 2;
+            g.add(glass);
 
             // Bottom
-            const bottomGeo = new THREE.CircleGeometry(CONFIG.tumblerRadius * 0.82, 24);
-            const bottom = new THREE.Mesh(bottomGeo, glassMat);
-            bottom.rotation.x = -Math.PI / 2;
-            bottom.position.y = 0.02;
-            group.add(bottom);
+            const botGeo = new THREE.CircleGeometry(CFG.tumblerRadius * 0.8, 24);
+            const bot = new THREE.Mesh(botGeo, glassMat);
+            bot.rotation.x = -Math.PI / 2; bot.position.y = 0.02;
+            g.add(bot);
 
             // Rim
-            const rimGeo = new THREE.TorusGeometry(CONFIG.tumblerRadius, 0.035, 6, 24);
-            const rimMat = new THREE.MeshStandardMaterial({ 
-                color: 0xffffff, transparent: true, opacity: 0.35, roughness: 0.1 
-            });
+            const rimGeo = new THREE.TorusGeometry(CFG.tumblerRadius, 0.03, 6, 24);
+            const rimMat = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.3, roughness: 0.1 });
             const rim = new THREE.Mesh(rimGeo, rimMat);
-            rim.rotation.x = Math.PI / 2;
-            rim.position.y = CONFIG.tumblerHeight;
-            group.add(rim);
+            rim.rotation.x = Math.PI / 2; rim.position.y = CFG.tumblerHeight;
+            g.add(rim);
 
             // Milk
-            const milkGeo = new THREE.CylinderGeometry(
-                CONFIG.tumblerRadius * 0.9, CONFIG.tumblerRadius * 0.75,
-                CONFIG.milkLevel, 24
-            );
-            const milkMat = new THREE.MeshStandardMaterial({
-                color: 0xfff8e7, roughness: 0.4, metalness: 0
-            });
+            const milkGeo = new THREE.CylinderGeometry(CFG.tumblerRadius * 0.88, CFG.tumblerRadius * 0.72, CFG.milkLevel, 24);
+            const milkMat = new THREE.MeshStandardMaterial({ color: 0xfff8e7, roughness: 0.4 });
             const milk = new THREE.Mesh(milkGeo, milkMat);
-            milk.position.y = CONFIG.milkLevel / 2 + 0.04;
-            group.add(milk);
+            milk.position.y = CFG.milkLevel / 2 + 0.03;
+            g.add(milk);
 
             // Surface
-            const surfGeo = new THREE.CircleGeometry(CONFIG.tumblerRadius * 0.9, 24);
+            const surfGeo = new THREE.CircleGeometry(CFG.tumblerRadius * 0.88, 24);
             const surfMat = new THREE.MeshStandardMaterial({
-                color: 0xfffff5, roughness: 0.3,
-                emissive: 0xfffff0, emissiveIntensity: 0.2
+                color: 0xfffff5, roughness: 0.25,
+                emissive: 0xfffff0, emissiveIntensity: 0.18
             });
             const surf = new THREE.Mesh(surfGeo, surfMat);
-            surf.rotation.x = -Math.PI / 2;
-            surf.position.y = CONFIG.milkLevel + 0.05;
-            group.add(surf);
+            surf.rotation.x = -Math.PI / 2; surf.position.y = CFG.milkLevel + 0.04;
+            g.add(surf);
 
-            return { group, surfMat };
+            // Placement cursor (visible during PLACE phase)
+            const cursorGeo = new THREE.RingGeometry(0.3, 0.35, 32);
+            const cursorMat = new THREE.MeshBasicMaterial({ color: 0xffd700, transparent: true, opacity: 0.6, side: THREE.DoubleSide });
+            const cursor = new THREE.Mesh(cursorGeo, cursorMat);
+            cursor.rotation.x = -Math.PI / 2;
+            cursor.visible = false;
+            g.add(cursor);
+
+            return { group: g, surfMat, cursorMat, cursor };
         }
 
         function createCookie() {
-            const group = new THREE.Group();
-
-            const bodyGeo = new THREE.CylinderGeometry(
-                CONFIG.cookieRadius, CONFIG.cookieRadius, CONFIG.cookieHeight, 16
-            );
-            const bodyMat = new THREE.MeshStandardMaterial({
-                color: 0xc47e3a, roughness: 0.95, metalness: 0
-            });
-            const body = new THREE.Mesh(bodyGeo, bodyMat);
-            group.add(body);
+            const g = new THREE.Group();
+            const bodyGeo = new THREE.CylinderGeometry(CFG.cookieRadius, CFG.cookieRadius, CFG.cookieHeight, 14);
+            const bodyMat = new THREE.MeshStandardMaterial({ color: 0xc47e3a, roughness: 0.95 });
+            g.add(new THREE.Mesh(bodyGeo, bodyMat));
 
             const chipMat = new THREE.MeshStandardMaterial({ color: 0x2a1505, roughness: 0.6 });
-            for (let i = 0; i < 5; i++) {
-                const chipGeo = new THREE.SphereGeometry(0.03 + Math.random() * 0.02, 6, 6);
-                const chip = new THREE.Mesh(chipGeo, chipMat);
+            for (let i = 0; i < 4; i++) {
+                const chip = new THREE.Mesh(new THREE.SphereGeometry(0.025 + Math.random() * 0.02, 5, 5), chipMat);
                 const a = Math.random() * Math.PI * 2;
-                const r = Math.random() * CONFIG.cookieRadius * 0.6;
-                chip.position.set(Math.cos(a) * r, CONFIG.cookieHeight / 2, Math.sin(a) * r);
+                const r = Math.random() * CFG.cookieRadius * 0.55;
+                chip.position.set(Math.cos(a) * r, CFG.cookieHeight / 2, Math.sin(a) * r);
                 chip.scale.y = 0.6;
-                group.add(chip);
+                g.add(chip);
             }
 
-            group.userData = { 
-                originalScale: 1, 
+            g.userData = {
                 floatPhase: Math.random() * Math.PI * 2,
-                floatSpeed: 0.5 + Math.random() * 0.5,
-                rotSpeed: (Math.random() - 0.5) * 2,
-                id: Math.random().toString(36).substr(2, 9)
+                floatSpeed: 0.6 + Math.random() * 0.6,
+                rotSpeed: (Math.random() - 0.5) * 2.5,
+                isHeld: false
             };
-
-            return group;
+            return g;
         }
 
         // ============================================================
@@ -393,402 +345,480 @@
         // ============================================================
         const tumblerData = createTumbler();
         const tumblerGroup = tumblerData.group;
-        tumblerGroup.position.set(0, 0, CONFIG.tumblerBaseZ);
+        tumblerGroup.visible = false;
         scene.add(tumblerGroup);
 
-        const cookiePool = [];
-        const cookieMeshes = []; // Track for raycasting logic
-
-        function spawnCookie() {
-            let pos;
-            let attempts = 0;
-            do {
-                const theta = Math.random() * Math.PI * 2;
-                const phi = (Math.random() - 0.5) * 0.7;
-                const r = CONFIG.spawnRadiusMin + Math.random() * (CONFIG.spawnRadiusMax - CONFIG.spawnRadiusMin);
-                pos = new THREE.Vector3(
-                    r * Math.cos(phi) * Math.sin(theta),
-                    1.2 + r * Math.sin(phi) * 0.5,
-                    r * Math.cos(phi) * Math.cos(theta)
-                );
-                attempts++;
-            } while (pos.distanceTo(tumblerGroup.position) < CONFIG.tumblerExclusion && attempts < 10);
-
-            const cookie = createCookie();
-            cookie.position.copy(pos);
-            cookie.scale.setScalar(0); // Start invisible for pop-in
-
-            // Pop-in animation
-            let s = 0;
-            const popIn = () => {
-                s += 0.08;
-                if (s < 1) {
-                    cookie.scale.setScalar(Math.min(s, 1));
-                    requestAnimationFrame(popIn);
-                } else {
-                    cookie.scale.setScalar(1);
-                }
-            };
-            popIn();
-
-            scene.add(cookie);
-            cookiePool.push(cookie);
-            return cookie;
-        }
-
-        // Initial spawn
-        for (let i = 0; i < CONFIG.poolSize; i++) spawnCookie();
-
-        // Trajectory preview
-        const trajGeo = new THREE.BufferGeometry();
-        const trajMat = new THREE.LineBasicMaterial({ 
-            color: 0xffdd00, transparent: true, opacity: 0.6 
+        // Virtual table (fallback mode only)
+        const tableGeo = new THREE.PlaneGeometry(20, 20);
+        const tableMat = new THREE.MeshBasicMaterial({
+            color: 0x1a1a2e, transparent: true, opacity: 0.15,
+            side: THREE.DoubleSide
         });
+        const tableMesh = new THREE.Mesh(tableGeo, tableMat);
+        tableMesh.rotation.x = -Math.PI / 2;
+        tableMesh.position.y = 0.01;
+        tableMesh.visible = false;
+        scene.add(tableMesh);
+
+        // Grid helper for spatial grounding
+        const gridHelper = new THREE.GridHelper(20, 20, 0x333344, 0x222233);
+        gridHelper.position.y = 0.02;
+        gridHelper.visible = false;
+        scene.add(gridHelper);
+
+        const cookiePool = [];
+
+        // Trajectory
+        const trajGeo = new THREE.BufferGeometry();
+        const trajMat = new THREE.LineBasicMaterial({ color: 0xffdd00, transparent: true, opacity: 0.5 });
         const trajLine = new THREE.Line(trajGeo, trajMat);
         scene.add(trajLine);
 
         // ============================================================
-        // GYROSCOPE & CAMERA CONTROL
+        // COOKIE MANAGEMENT
         // ============================================================
-        const targetEuler = new THREE.Euler(0, 0, 0, 'YXZ');
-        const currentEuler = new THREE.Euler(0, 0, 0, 'YXZ');
-        let gyroSmoothing = 0.12;
+        function spawnCookieNearTumbler() {
+            if (cookiePool.length >= CFG.poolSize) return;
 
-        async function requestCamera() {
+            const tPos = tumblerGroup.position;
+            const angle = Math.random() * Math.PI * 2;
+            const dist = 0.8 + Math.random() * CFG.spawnNearTumbler;
+            const height = 0.6 + Math.random() * CFG.spawnHeight;
+
+            const cookie = createCookie();
+            cookie.position.set(
+                tPos.x + Math.cos(angle) * dist,
+                height,
+                tPos.z + Math.sin(angle) * dist
+            );
+            cookie.scale.setScalar(0);
+            scene.add(cookie);
+            cookiePool.push(cookie);
+
+            // Pop in
+            let s = 0;
+            const pop = () => {
+                s += 0.1;
+                if (s < 1) { cookie.scale.setScalar(s); requestAnimationFrame(pop); }
+                else cookie.scale.setScalar(1);
+            };
+            pop();
+        }
+
+        function removeCookie(cookie) {
+            const idx = cookiePool.indexOf(cookie);
+            if (idx > -1) {
+                scene.remove(cookie);
+                cookiePool.splice(idx, 1);
+            }
+        }
+
+        // ============================================================
+        // WEBXR SETUP
+        // ============================================================
+        async function detectWebXR() {
+            if (!navigator.xr) return false;
+            try {
+                return await navigator.xr.isSessionSupported('immersive-ar');
+            } catch { return false; }
+        }
+
+        async function initWebXR() {
+            STATE.mode = 'WEBXR';
+            statusText.textContent = 'Starting WebXR session...';
+
+            try {
+                STATE.xrSession = await navigator.xr.requestSession('immersive-ar', {
+                    requiredFeatures: ['hit-test'],
+                    optionalFeatures: ['dom-overlay'],
+                    domOverlay: { root: document.body }
+                });
+
+                STATE.xrRefSpace = await STATE.xrSession.requestReferenceSpace('local-floor');
+
+                // Hit test source
+                const viewerSpace = await STATE.xrSession.requestReferenceSpace('viewer');
+                STATE.xrHitTestSource = await STATE.xrSession.requestHitTestSource({
+                    space: viewerSpace,
+                    entityTypes: ['plane']
+                });
+
+                // WebXR render loop
+                STATE.xrSession.requestAnimationFrame(onXRFrame);
+
+                // Hide gate
+                gate.classList.add('fade-out');
+                setTimeout(() => {
+                    gate.style.display = 'none';
+                    enterPlacePhase();
+                }, 400);
+
+            } catch (err) {
+                console.error('WebXR failed:', err);
+                statusText.textContent = 'WebXR failed. Switching to fallback...';
+                setTimeout(initFallback, 1500);
+            }
+        }
+
+        function onXRFrame(time, frame) {
+            if (!STATE.xrSession) return;
+            STATE.xrSession.requestAnimationFrame(onXRFrame);
+
+            const pose = frame.getViewerPose(STATE.xrRefSpace);
+            if (!pose) return;
+
+            // Update camera from XR pose
+            const view = pose.views[0];
+            camera.matrix.fromArray(view.transform.matrix);
+            camera.matrix.decompose(camera.position, camera.quaternion, camera.scale);
+
+            // Hit test during PLACE phase
+            if (STATE.phase === 'PLACE' && STATE.xrHitTestSource) {
+                const hitTestResults = frame.getHitTestResults(STATE.xrHitTestSource);
+                if (hitTestResults.length > 0) {
+                    const hit = hitTestResults[0];
+                    const hitPose = hit.getPose(STATE.xrRefSpace);
+                    if (hitPose) {
+                        const pos = new THREE.Vector3().setFromMatrixPosition(
+                            new THREE.Matrix4().fromArray(hitPose.transform.matrix)
+                        );
+                        tumblerData.cursor.visible = true;
+                        tumblerData.cursor.position.set(pos.x, pos.y + 0.02, pos.z);
+                        tumblerData.cursor.lookAt(pos.x, pos.y + 1, pos.z);
+                        STATE.pendingTumblerPos = pos;
+                    }
+                } else {
+                    tumblerData.cursor.visible = false;
+                }
+            }
+
+            // Render
+            const glLayer = STATE.xrSession.renderState.baseLayer;
+            renderer.setFramebuffer(glLayer.framebuffer);
+            renderer.render(scene, camera);
+        }
+
+        // ============================================================
+        // FALLBACK (GYRO + VIDEO) SETUP
+        // ============================================================
+        async function initFallback() {
+            STATE.mode = 'FALLBACK';
+            statusText.textContent = 'Starting camera...';
+
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { 
-                        facingMode: 'environment',
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    },
+                    video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
                     audio: false
                 });
                 videoEl.srcObject = stream;
                 await videoEl.play();
                 videoEl.style.display = 'block';
-                return true;
-            } catch (err) {
-                statusText.textContent = 'Camera access denied. Using touch mode.';
-                return false;
+            } catch {
+                statusText.textContent = 'Camera unavailable. Playing without video.';
             }
-        }
 
-        async function requestOrientation() {
+            // Request gyro
             if (typeof DeviceOrientationEvent?.requestPermission === 'function') {
                 try {
                     const state = await DeviceOrientationEvent.requestPermission();
-                    return state === 'granted';
-                } catch (err) {
-                    return false;
-                }
+                    STATE.gyroEnabled = state === 'granted';
+                } catch { STATE.gyroEnabled = false; }
+            } else {
+                STATE.gyroEnabled = true;
             }
-            return true; // Android doesn't need explicit permission
+
+            if (STATE.gyroEnabled) {
+                window.addEventListener('deviceorientation', onGyro);
+            }
+
+            // Show virtual table
+            tableMesh.visible = true;
+            gridHelper.visible = true;
+
+            gate.classList.add('fade-out');
+            setTimeout(() => {
+                gate.style.display = 'none';
+                // Auto-place tumbler in fallback
+                tumblerGroup.position.copy(STATE.tumblerPos);
+                tumblerGroup.visible = true;
+                STATE.tumblerPlaced = true;
+                enterThrowPhase();
+            }, 400);
         }
 
-        function onOrientation(e) {
-            if (e.alpha === null || e.beta === null || e.gamma === null) return;
-
-            // YXZ order prevents gimbal lock for phone orientations
+        // Gyro handler
+        const targetEuler = new THREE.Euler(0, 0, 0, 'YXZ');
+        const currentEuler = new THREE.Euler(0, 0, 0, 'YXZ');
+        function onGyro(e) {
+            if (e.alpha === null) return;
             targetEuler.set(
-                THREE.MathUtils.degToRad(Math.max(-60, Math.min(60, e.beta - 90))), // Pitch clamp
-                THREE.MathUtils.degToRad(-e.alpha),   // Yaw (inverted)
-                THREE.MathUtils.degToRad(-e.gamma),   // Roll (inverted)
+                THREE.MathUtils.degToRad(Math.max(-55, Math.min(55, e.beta - 90))),
+                THREE.MathUtils.degToRad(-e.alpha),
+                THREE.MathUtils.degToRad(-e.gamma),
                 'YXZ'
             );
         }
 
-        function updateGyroCamera() {
-            if (!STATE.gyroEnabled) return;
-
-            // Smooth interpolation
-            currentEuler.x += (targetEuler.x - currentEuler.x) * gyroSmoothing;
-            currentEuler.y += (targetEuler.y - currentEuler.y) * gyroSmoothing;
-            currentEuler.z += (targetEuler.z - currentEuler.z) * gyroSmoothing;
-
+        function updateFallbackCamera() {
+            if (STATE.mode !== 'FALLBACK' || !STATE.gyroEnabled) return;
+            currentEuler.x += (targetEuler.x - currentEuler.x) * 0.12;
+            currentEuler.y += (targetEuler.y - currentEuler.y) * 0.12;
+            currentEuler.z += (targetEuler.z - currentEuler.z) * 0.12;
             camera.quaternion.setFromEuler(currentEuler);
         }
 
-        // Touch fallback for panning
-        function onTouchStartPan(e) {
-            if (STATE.phase !== 'EXPLORE' && STATE.phase !== 'LANDING') return;
-            STATE.touchPan.active = true;
-            STATE.touchPan.lastX = e.touches[0].clientX;
-            STATE.touchPan.lastY = e.touches[0].clientY;
+        // ============================================================
+        // PHASE MANAGEMENT
+        // ============================================================
+        function enterPlacePhase() {
+            STATE.phase = 'PLACE';
+            phaseBadge.textContent = 'Tap to Place Tumbler';
+            showMessage('Scan the floor', 'Tap where you want the tumbler', '#ffd700');
+
+            // Tap to place
+            const placeHandler = (e) => {
+                e.preventDefault();
+                if (STATE.pendingTumblerPos) {
+                    STATE.tumblerPos.copy(STATE.pendingTumblerPos);
+                    tumblerGroup.position.copy(STATE.tumblerPos);
+                    tumblerGroup.visible = true;
+                    tumblerData.cursor.visible = false;
+                    STATE.tumblerPlaced = true;
+
+                    hideMessage();
+                    enterThrowPhase();
+
+                    renderer.domElement.removeEventListener('mousedown', placeHandler);
+                    renderer.domElement.removeEventListener('touchstart', placeHandler);
+                }
+            };
+
+            renderer.domElement.addEventListener('mousedown', placeHandler);
+            renderer.domElement.addEventListener('touchstart', placeHandler, { passive: false });
         }
 
-        function onTouchMovePan(e) {
-            if (!STATE.touchPan.active) return;
-            const touch = e.touches[0];
-            const dx = touch.clientX - STATE.touchPan.lastX;
-            const dy = touch.clientY - STATE.touchPan.lastY;
+        function enterThrowPhase() {
+            STATE.phase = 'THROW';
+            phaseBadge.textContent = 'Swipe to Throw';
+            showMessage('Swipe up!', 'Dunk the cookie in milk', '#00ff88');
+            setTimeout(hideMessage, 2000);
 
-            // Manual camera rotation (yaw only for simplicity)
-            camera.rotation.y -= dx * 0.004;
-            camera.rotation.x -= dy * 0.003;
-            camera.rotation.x = Math.max(-0.5, Math.min(0.5, camera.rotation.x)); // Clamp pitch
-
-            STATE.touchPan.lastX = touch.clientX;
-            STATE.touchPan.lastY = touch.clientY;
-        }
-
-        function onTouchEndPan() {
-            STATE.touchPan.active = false;
+            // Spawn initial cookies
+            for (let i = 0; i < CFG.poolSize; i++) {
+                setTimeout(() => spawnCookieNearTumbler(), i * 400);
+            }
         }
 
         // ============================================================
-        // INPUT SYSTEM (Throw Mechanics)
+        // INPUT — DIRECT SPAWN THROW
         // ============================================================
         function getPos(e) {
-            if (e.touches && e.touches.length > 0) {
-                return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-            }
-            return { x: e.clientX, y: e.clientY };
+            return e.touches?.[0] ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+                : { x: e.clientX, y: e.clientY };
         }
 
-        function getTargetableCookie() {
-            let best = null;
-            let bestDist = Infinity;
-
-            cookiePool.forEach(cookie => {
-                if (!cookie.parent || cookie.userData.isHeld) return;
-
-                const pos = cookie.position.clone().project(camera);
-                // Check if in front of camera
-                if (pos.z > 1) return;
-
-                const dist = Math.sqrt(pos.x * pos.x + pos.y * pos.y);
-                if (dist < CONFIG.reticleThreshold && dist < bestDist) {
-                    bestDist = dist;
-                    best = cookie;
-                }
-            });
-
-            return best;
-        }
-
-        function onInputStart(e) {
-            if (STATE.phase !== 'EXPLORE' || STATE.cookiesLeft <= 0) return;
+        function onStart(e) {
+            if (STATE.phase !== 'THROW' || STATE.cookiesLeft <= 0) return;
             e.preventDefault();
 
-            const pos = getPos(e);
-
-            // Check if we're touching a targetable cookie
-            const target = getTargetableCookie();
-            if (target) {
-                STATE.activeCookie = target;
-                STATE.phase = 'PICKUP';
-                STATE.pickupProgress = 0;
-                STATE.pickupStartPos.copy(target.position);
-                target.userData.isHeld = true;
-                updatePhase('Pickup');
-
-                reticle.classList.add('locked');
-                hideMessage();
-            } else {
-                // Begin touch pan
-                onTouchStartPan(e);
-            }
-        }
-
-        function onInputMove(e) {
-            if (STATE.touchPan.active) {
-                onTouchMovePan(e);
+            // Touch pan fallback
+            if (!STATE.gyroEnabled && STATE.mode === 'FALLBACK') {
+                STATE.touchPan.active = true;
+                const p = getPos(e);
+                STATE.touchPan.lastX = p.x; STATE.touchPan.lastY = p.y;
                 return;
             }
-            if (STATE.phase !== 'AIM') return;
+
+            // Spawn cookie at hand position
+            const p = getPos(e);
+            STATE.aimStart = p;
+            STATE.aimCurrent = p;
+
+            STATE.activeCookie = createCookie();
+            const handPos = new THREE.Vector3(0, -0.3, -0.5).applyQuaternion(camera.quaternion).add(camera.position);
+            STATE.activeCookie.position.copy(handPos);
+            STATE.activeCookie.userData.isHeld = true;
+            scene.add(STATE.activeCookie);
+
+            reticle.classList.add('charging');
+            powerBar.style.display = 'block';
+            powerFill.style.width = '0%';
+
+            hideMessage();
+        }
+
+        function onMove(e) {
+            if (STATE.touchPan.active) {
+                const p = getPos(e);
+                camera.rotation.y -= (p.x - STATE.touchPan.lastX) * 0.004;
+                camera.rotation.x -= (p.y - STATE.touchPan.lastY) * 0.003;
+                camera.rotation.x = Math.max(-0.5, Math.min(0.5, camera.rotation.x));
+                STATE.touchPan.lastX = p.x; STATE.touchPan.lastY = p.y;
+                return;
+            }
+            if (!STATE.activeCookie || !STATE.aimStart) return;
             e.preventDefault();
 
-            const pos = getPos(e);
-            STATE.aimCurrent = pos;
+            STATE.aimCurrent = getPos(e);
+            const dx = STATE.aimCurrent.x - STATE.aimStart.x;
+            const dy = STATE.aimCurrent.y - STATE.aimStart.y;
+            const power = Math.sqrt(dx*dx + dy*dy);
+            const ratio = Math.min(power, CFG.maxSwipe) / CFG.maxSwipe;
 
-            const dx = pos.x - STATE.aimStart.x;
-            const dy = pos.y - STATE.aimStart.y;
-            const power = Math.sqrt(dx * dx + dy * dy);
-
-            // Update visuals
-            const ratio = Math.min(power, CONFIG.maxSwipePower) / CONFIG.maxSwipePower;
             powerFill.style.width = (ratio * 100) + '%';
 
-            // Update trajectory
+            // Update hand position
+            const handPos = new THREE.Vector3(0, -0.3, -0.5).applyQuaternion(camera.quaternion).add(camera.position);
+            STATE.activeCookie.position.copy(handPos);
+
+            // Scale cookie based on power
+            STATE.activeCookie.scale.setScalar(0.7 + ratio * 0.5);
+
             updateTrajectory(dx, dy);
         }
 
-        function onInputEnd(e) {
-            if (STATE.touchPan.active) {
-                onTouchEndPan();
-                return;
-            }
-            if (STATE.phase === 'PICKUP') {
-                // Cancel pickup if released too early
-                STATE.phase = 'EXPLORE';
-                STATE.activeCookie.userData.isHeld = false;
-                STATE.activeCookie = null;
-                reticle.classList.remove('locked');
-                updatePhase('Explore');
-                return;
-            }
-            if (STATE.phase !== 'AIM') return;
+        function onEnd(e) {
+            if (STATE.touchPan.active) { STATE.touchPan.active = false; return; }
+            if (!STATE.activeCookie || !STATE.aimStart) return;
 
+            reticle.classList.remove('charging');
             powerBar.style.display = 'none';
             trajGeo.setFromPoints([]);
 
             const dx = STATE.aimCurrent.x - STATE.aimStart.x;
             const dy = STATE.aimCurrent.y - STATE.aimStart.y;
-            const power = Math.sqrt(dx * dx + dy * dy);
+            const power = Math.sqrt(dx*dx + dy*dy);
 
             if (power < 30) {
-                // Cancel weak throw
-                STATE.phase = 'EXPLORE';
-                STATE.activeCookie.userData.isHeld = false;
+                // Cancel
+                scene.remove(STATE.activeCookie);
                 STATE.activeCookie = null;
-                reticle.classList.remove('locked');
-                updatePhase('Explore');
+                STATE.aimStart = null;
                 return;
             }
 
-            throwCookie(dx, dy);
+            // LAUNCH
+            STATE.cookiesLeft--;
+            STATE.throwsSinceReset++;
+            updateHUD();
+
+            const normPower = Math.min(power, CFG.maxSwipe) / CFG.maxSwipe;
+            const forward = -dy * CFG.powerScale;
+            const up = Math.max(normPower * CFG.upScale, CFG.minUp);
+            const side = dx * CFG.sideScale;
+
+            const localVel = new THREE.Vector3(side, up, -forward);
+            STATE.cookieVel.copy(localVel.applyQuaternion(camera.quaternion));
+
+            STATE.cookieSpin.set(
+                (Math.random() - 0.5) * 12,
+                (Math.random() - 0.5) * 6,
+                (Math.random() - 0.5) * 12
+            );
+
+            STATE.aimStart = null;
+
+            // Show reset button after N throws
+            if (STATE.throwsSinceReset >= CFG.resetAfterThrows) {
+                resetBtn.style.display = 'block';
+            }
         }
 
         function updateTrajectory(dx, dy) {
-            const power = Math.sqrt(dx * dx + dy * dy);
-            const normPower = Math.min(power, CONFIG.maxSwipePower) / CONFIG.maxSwipePower;
+            const power = Math.sqrt(dx*dx + dy*dy);
+            const normPower = Math.min(power, CFG.maxSwipe) / CFG.maxSwipe;
+            const forward = -dy * CFG.powerScale;
+            const up = Math.max(normPower * CFG.upScale, CFG.minUp);
+            const side = dx * CFG.sideScale;
 
-            const forward = -dy * CONFIG.powerScale;
-            const up = Math.max(normPower * CONFIG.upScale, CONFIG.minUpVelocity);
-            const side = dx * CONFIG.sideScale;
-
-            // Local velocity in camera space
             const localVel = new THREE.Vector3(side, up, -forward);
             const worldVel = localVel.applyQuaternion(camera.quaternion);
 
-            // Simulate
             const points = [];
             const pos = STATE.activeCookie.position.clone();
-            const dt = 0.035;
+            const dt = 0.03;
             const simVel = worldVel.clone();
 
-            for (let i = 0; i < 35; i++) {
+            for (let i = 0; i < 30; i++) {
                 points.push(pos.clone());
-                simVel.y += CONFIG.gravity * dt;
+                simVel.y += CFG.gravity * dt;
                 pos.add(simVel.clone().multiplyScalar(dt));
                 if (pos.y < 0) break;
             }
-
             trajGeo.setFromPoints(points);
         }
 
-        function throwCookie(dx, dy) {
-            STATE.phase = 'THROW';
-            STATE.cookiesLeft--;
-            updateHUD();
-            updatePhase('Throw');
-
-            const power = Math.sqrt(dx * dx + dy * dy);
-            const normPower = Math.min(power, CONFIG.maxSwipePower) / CONFIG.maxSwipePower;
-
-            const forward = -dy * CONFIG.powerScale;
-            const up = Math.max(normPower * CONFIG.upScale, CONFIG.minUpVelocity);
-            const side = dx * CONFIG.sideScale;
-
-            const localVel = new THREE.Vector3(side, up, -forward);
-            STATE.cookieVelocity.copy(localVel.applyQuaternion(camera.quaternion));
-
-            STATE.cookieSpin.set(
-                (Math.random() - 0.5) * 10,
-                (Math.random() - 0.5) * 5,
-                (Math.random() - 0.5) * 10
-            );
-
-            reticle.classList.remove('locked');
-            hideMessage();
-        }
-
-        // Event binding
         const canvas = renderer.domElement;
-        canvas.addEventListener('mousedown', onInputStart);
-        canvas.addEventListener('touchstart', onInputStart, { passive: false });
-        window.addEventListener('mousemove', onInputMove);
-        window.addEventListener('touchmove', onInputMove, { passive: false });
-        window.addEventListener('mouseup', onInputEnd);
-        window.addEventListener('touchend', onInputEnd);
+        canvas.addEventListener('mousedown', onStart);
+        canvas.addEventListener('touchstart', onStart, { passive: false });
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('touchmove', onMove, { passive: false });
+        window.addEventListener('mouseup', onEnd);
+        window.addEventListener('touchend', onEnd);
 
         // ============================================================
         // COLLISION & SCORING
         // ============================================================
         function checkCollisions() {
-            const cookie = STATE.activeCookie;
-            if (!cookie) return false;
+            const c = STATE.activeCookie;
+            if (!c) return false;
 
-            const pos = cookie.position;
+            const pos = c.position;
             const tPos = tumblerGroup.position;
+            const hDist = Math.sqrt((pos.x - tPos.x)**2 + (pos.z - tPos.z)**2);
+            const milkY = CFG.milkLevel + (STATE.mode === 'WEBXR' ? tPos.y : 0);
 
-            const hDist = Math.sqrt((pos.x - tPos.x) ** 2 + (pos.z - tPos.z) ** 2);
-            const milkY = CONFIG.milkLevel + 0.1;
-            const atMilkHeight = pos.y < milkY + 0.4 && pos.y > milkY - 0.3;
-            const descending = STATE.cookieVelocity.y < -0.5;
-            const inMouth = hDist < CONFIG.tumblerRadius * 0.75;
+            const atMilk = pos.y < milkY + 0.4 && pos.y > milkY - 0.3;
+            const descending = STATE.cookieVel.y < -0.5;
+            const inMouth = hDist < CFG.tumblerRadius * 0.75;
 
-            if (inMouth && atMilkHeight && descending) {
-                handleScore(pos);
+            if (inMouth && atMilk && descending) {
+                handleScore(pos, milkY);
                 return true;
             }
 
-            // Floor bounce
-            if (pos.y <= CONFIG.cookieRadius && pos.y > -1) {
-                STATE.cookieVelocity.y *= -0.35;
-                STATE.cookieVelocity.x *= 0.5;
-                STATE.cookieVelocity.z *= 0.5;
+            if (pos.y <= CFG.cookieRadius && pos.y > -1) {
+                STATE.cookieVel.y *= -0.3;
+                STATE.cookieVel.x *= 0.5; STATE.cookieVel.z *= 0.5;
                 STATE.cookieSpin.multiplyScalar(0.4);
-
-                if (Math.abs(STATE.cookieVelocity.y) < 0.6) {
-                    handleMiss();
-                }
+                if (Math.abs(STATE.cookieVel.y) < 0.5) { handleMiss(); }
                 return true;
             }
 
-            // Out of bounds
-            if (pos.z < -18 || pos.y < -1 || Math.abs(pos.x) > 12) {
+            if (pos.z < -20 || pos.y < -2 || Math.abs(pos.x) > 15) {
                 handleMiss();
                 return true;
             }
-
             return false;
         }
 
-        function handleScore(pos) {
+        function handleScore(pos, milkY) {
             STATE.phase = 'RESOLVE';
-            STATE.score++;
-            STATE.combo++;
+            STATE.score++; STATE.combo++;
+            STATE.throwsSinceReset = 0;
+            resetBtn.style.display = 'none';
 
-            STATE.cookieVelocity.set(0, 0, 0);
+            STATE.cookieVel.set(0, 0, 0);
             STATE.cookieSpin.set(0, 0, 0);
-            STATE.activeCookie.position.y = milkY + 0.1;
+            STATE.activeCookie.position.y = milkY + 0.08;
+            STATE.activeCookie.scale.setScalar(1);
 
             createSplash(pos);
             cameraShake();
 
-            const comboText = STATE.combo > 1 ? ` x${STATE.combo}` : '';
-            showMessage('DUNK!', comboText, '#ffd700');
+            const comboTxt = STATE.combo > 1 ? ` x${STATE.combo}` : '';
+            showMessage('DUNK!', comboTxt, '#ffd700');
             updateHUD();
 
-            // Remove cookie from pool
-            const idx = cookiePool.indexOf(STATE.activeCookie);
-            if (idx > -1) {
-                scene.remove(cookiePool[idx]);
-                cookiePool.splice(idx, 1);
-            }
-            STATE.activeCookie = null;
-
             setTimeout(() => {
+                removeCookie(STATE.activeCookie);
+                STATE.activeCookie = null;
                 if (STATE.cookiesLeft > 0) {
-                    spawnCookie(); // Replenish
-                    resetToExplore();
+                    STATE.phase = 'THROW';
+                    spawnCookieNearTumbler();
                     randomizeTumbler();
-                } else {
-                    endGame();
-                }
-            }, 1400);
+                } else { endGame(); }
+            }, 1300);
         }
 
         function handleMiss() {
@@ -797,324 +827,192 @@
             showMessage('Miss!', '', '#ff6b6b');
             updateHUD();
 
-            // Return cookie to pool or remove
-            if (STATE.activeCookie) {
-                STATE.activeCookie.userData.isHeld = false;
-                STATE.activeCookie = null;
-            }
-
             setTimeout(() => {
-                if (STATE.cookiesLeft > 0) {
-                    resetToExplore();
-                } else {
-                    endGame();
+                if (STATE.activeCookie) {
+                    scene.remove(STATE.activeCookie);
+                    STATE.activeCookie = null;
                 }
-            }, 1200);
-        }
-
-        function resetToExplore() {
-            STATE.phase = 'EXPLORE';
-            STATE.activeCookie = null;
-            STATE.pickupProgress = 0;
-            updatePhase('Explore');
+                if (STATE.cookiesLeft > 0) {
+                    STATE.phase = 'THROW';
+                    spawnCookieNearTumbler();
+                } else { endGame(); }
+            }, 1000);
         }
 
         function randomizeTumbler() {
             const combo = Math.min(STATE.combo, 5);
-            const dist = 4 + combo * 0.7;
-            const spread = Math.min(1.2 + combo * 0.35, 3.5);
+            const dist = 3.5 + combo * 0.6;
+            const spread = Math.min(1.0 + combo * 0.3, 3);
 
             const target = new THREE.Vector3(
                 (Math.random() - 0.5) * spread * 2,
-                0,
+                STATE.mode === 'WEBXR' ? 0 : 0,
                 -dist
             );
 
-            const start = tumblerGroup.position.clone();
-            let t = 0;
-
-            function slide() {
-                t += 0.035;
-                if (t <= 1) {
-                    tumblerGroup.position.lerpVectors(start, target, t);
-                    tumblerGroup.position.y = Math.sin(t * Math.PI) * 0.25;
-                    requestAnimationFrame(slide);
-                } else {
-                    tumblerGroup.position.copy(target);
-                }
+            if (STATE.mode === 'FALLBACK') {
+                // Animate hop
+                const start = tumblerGroup.position.clone();
+                let t = 0;
+                const slide = () => {
+                    t += 0.04;
+                    if (t <= 1) {
+                        tumblerGroup.position.lerpVectors(start, target, t);
+                        tumblerGroup.position.y = Math.sin(t * Math.PI) * 0.2;
+                        requestAnimationFrame(slide);
+                    } else { tumblerGroup.position.copy(target); }
+                };
+                slide();
+            } else {
+                tumblerGroup.position.copy(target);
             }
-            slide();
         }
 
         // ============================================================
-        // FX SYSTEMS
+        // FX
         // ============================================================
-        function createSplash(position) {
+        function createSplash(pos) {
             const particles = [];
-            for (let i = 0; i < 16; i++) {
-                const geo = new THREE.SphereGeometry(0.035 + Math.random() * 0.025, 5, 5);
-                const mat = new THREE.MeshBasicMaterial({ 
-                    color: 0xfffff0, transparent: true, opacity: 0.9 
-                });
+            for (let i = 0; i < 14; i++) {
+                const geo = new THREE.SphereGeometry(0.03 + Math.random() * 0.02, 5, 5);
+                const mat = new THREE.MeshBasicMaterial({ color: 0xfffff0, transparent: true, opacity: 0.9 });
                 const mesh = new THREE.Mesh(geo, mat);
-                mesh.position.copy(position);
-                mesh.position.y += 0.15;
+                mesh.position.copy(pos); mesh.position.y += 0.1;
 
                 const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 2.2 + 0.4;
+                const speed = Math.random() * 2 + 0.3;
                 const vel = new THREE.Vector3(
-                    Math.cos(angle) * speed * 0.35,
-                    Math.random() * 2.5 + 1.2,
-                    Math.sin(angle) * speed * 0.35
+                    Math.cos(angle) * speed * 0.3,
+                    Math.random() * 2 + 1,
+                    Math.sin(angle) * speed * 0.3
                 );
 
                 scene.add(mesh);
-                particles.push({ mesh, vel, life: 1.0 });
+                particles.push({ mesh, vel, life: 1 });
             }
 
-            function animate() {
+            function anim() {
                 let alive = false;
                 particles.forEach(p => {
                     if (p.life > 0) {
-                        p.vel.y += CONFIG.gravity * 0.016;
+                        p.vel.y += CFG.gravity * 0.016;
                         p.mesh.position.add(p.vel.clone().multiplyScalar(0.016));
-                        p.life -= 0.028;
+                        p.life -= 0.03;
                         p.mesh.material.opacity = Math.max(0, p.life);
-                        p.mesh.scale.setScalar(0.3 + p.life * 0.7);
                         alive = true;
-                    } else if (p.mesh.visible) {
-                        p.mesh.visible = false;
-                        scene.remove(p.mesh);
-                    }
+                    } else if (p.mesh.visible) { p.mesh.visible = false; scene.remove(p.mesh); }
                 });
-                if (alive) requestAnimationFrame(animate);
+                if (alive) requestAnimationFrame(anim);
             }
-            animate();
+            anim();
         }
 
         let shakeIntensity = 0;
-        function cameraShake() {
-            shakeIntensity = 0.35;
-        }
+        function cameraShake() { shakeIntensity = 0.3; }
 
         function showMessage(main, sub, color) {
-            msgMain.textContent = main;
-            msgMain.style.color = color;
-            msgSub.textContent = sub;
-            msgSub.style.color = color;
+            msgMain.textContent = main; msgMain.style.color = color;
+            msgSub.textContent = sub; msgSub.style.color = color;
             msgOverlay.classList.add('show');
-            setTimeout(() => msgOverlay.classList.remove('show'), 1300);
+            setTimeout(() => msgOverlay.classList.remove('show'), 1200);
         }
-
-        function hideMessage() {
-            msgOverlay.classList.remove('show');
-        }
-
-        function updatePhase(name) {
-            phaseIndicator.textContent = name;
-        }
+        function hideMessage() { msgOverlay.classList.remove('show'); }
 
         function updateHUD() {
             document.getElementById('score-display').textContent = STATE.score;
             document.getElementById('cookies-display').textContent = STATE.cookiesLeft;
             const comboEl = document.getElementById('combo-display');
-            if (STATE.combo > 1) {
-                comboEl.textContent = `🔥 Combo x${STATE.combo}`;
-                comboEl.classList.add('active');
-            } else {
-                comboEl.classList.remove('active');
-            }
+            if (STATE.combo > 1) { comboEl.textContent = `🔥 Combo x${STATE.combo}`; comboEl.classList.add('active'); }
+            else comboEl.classList.remove('active');
         }
 
         function endGame() {
             STATE.phase = 'END';
-            STATE.gameActive = false;
             showMessage('Game Over', `Score: ${STATE.score}`, '#ff6b6b');
-
             setTimeout(() => {
                 msgMain.textContent = 'Tap to Restart';
-                msgSub.textContent = '';
                 msgOverlay.classList.add('show');
-
                 const restart = (e) => {
                     e.preventDefault();
                     msgOverlay.classList.remove('show');
-
-                    STATE.score = 0;
-                    STATE.combo = 0;
-                    STATE.cookiesLeft = CONFIG.maxCookies;
-                    STATE.gameActive = true;
-
-                    // Clear old cookies
-                    cookiePool.forEach(c => scene.remove(c));
-                    cookiePool.length = 0;
-                    for (let i = 0; i < CONFIG.poolSize; i++) spawnCookie();
-
-                    tumblerGroup.position.set(0, 0, CONFIG.tumblerBaseZ);
-
+                    STATE.score = 0; STATE.combo = 0; STATE.cookiesLeft = CFG.maxCookies;
+                    STATE.throwsSinceReset = 0; resetBtn.style.display = 'none';
+                    cookiePool.forEach(c => removeCookie(c));
+                    for (let i = 0; i < CFG.poolSize; i++) setTimeout(spawnCookieNearTumbler, i * 300);
+                    tumblerGroup.position.set(0, 0, -3.5);
                     updateHUD();
-                    resetToExplore();
+                    STATE.phase = 'THROW';
                 };
-
                 canvas.addEventListener('mousedown', restart, { once: true });
                 canvas.addEventListener('touchstart', restart, { once: true, passive: false });
-            }, 1500);
+            }, 1400);
         }
 
+        // Reset button handler
+        resetBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            STATE.throwsSinceReset = 0;
+            resetBtn.style.display = 'none';
+
+            if (STATE.mode === 'WEBXR') {
+                tumblerGroup.visible = false;
+                STATE.tumblerPlaced = false;
+                enterPlacePhase();
+            } else {
+                randomizeTumbler();
+                showMessage('Tumbler moved!', 'Keep throwing', '#00ff88');
+            }
+        });
+
         // ============================================================
-        // MAIN GAME LOOP
+        // MAIN LOOP
         // ============================================================
         const clock = new THREE.Clock();
-        const handOffset = new THREE.Vector3(0.25, -0.35, -0.55);
 
         function animate() {
+            if (STATE.mode === 'WEBXR') return; // WebXR has its own rAF loop
+
             requestAnimationFrame(animate);
             const dt = Math.min(clock.getDelta(), 0.05);
             const time = clock.getElapsedTime();
 
-            // Update gyro camera
-            updateGyroCamera();
+            updateFallbackCamera();
 
-            // Camera shake
-            if (shakeIntensity > 0.01) {
-                camera.position.x = (Math.random() - 0.5) * shakeIntensity;
-                camera.position.y = 1.6 + (Math.random() - 0.5) * shakeIntensity;
-                shakeIntensity *= 0.88;
-            } else if (shakeIntensity > 0) {
-                camera.position.set(0, 1.6, 0);
-                shakeIntensity = 0;
-            }
-
-            // Pickup animation
-            if (STATE.phase === 'PICKUP' && STATE.activeCookie) {
-                STATE.pickupProgress += dt / CONFIG.pickupDuration;
-                if (STATE.pickupProgress >= 1) {
-                    STATE.pickupProgress = 1;
-                    STATE.phase = 'AIM';
-                    STATE.aimStart = { ...STATE.aimCurrent };
-                    updatePhase('Aim');
-                    powerBar.style.display = 'block';
-                    powerFill.style.width = '0%';
-                }
-
-                const handPos = camera.position.clone().add(
-                    handOffset.clone().applyQuaternion(camera.quaternion)
-                );
-
-                const t = easeOutCubic(STATE.pickupProgress);
-                STATE.activeCookie.position.lerpVectors(STATE.pickupStartPos, handPos, t);
-                STATE.activeCookie.scale.setScalar(1 - t * 0.25);
-                STATE.activeCookie.rotation.x += dt * 3;
-                STATE.activeCookie.rotation.y += dt * 2;
-            }
-
-            // Throw physics
-            if (STATE.phase === 'THROW' && STATE.activeCookie) {
-                STATE.cookieVelocity.y += CONFIG.gravity * dt;
-                STATE.activeCookie.position.add(STATE.cookieVelocity.clone().multiplyScalar(dt));
-
+            // Physics
+            if (STATE.phase === 'THROW' && STATE.activeCookie && STATE.cookieVel.lengthSq() > 0.01) {
+                STATE.cookieVel.y += CFG.gravity * dt;
+                STATE.activeCookie.position.add(STATE.cookieVel.clone().multiplyScalar(dt));
                 STATE.activeCookie.rotation.x += STATE.cookieSpin.x * dt;
                 STATE.activeCookie.rotation.y += STATE.cookieSpin.y * dt;
                 STATE.activeCookie.rotation.z += STATE.cookieSpin.z * dt;
-
                 checkCollisions();
             }
 
-            // Idle cookie animations
-            if (STATE.phase === 'EXPLORE' || STATE.phase === 'LANDING') {
-                cookiePool.forEach((cookie, i) => {
-                    if (cookie.userData.isHeld) return;
-                    const d = cookie.userData;
-                    cookie.position.y += Math.sin(time * d.floatSpeed + d.floatPhase) * 0.003;
-                    cookie.rotation.y += d.rotSpeed * dt;
-
-                    // Highlight if targetable
-                    const pos = cookie.position.clone().project(camera);
-                    if (pos.z < 1) {
-                        const dist = Math.sqrt(pos.x * pos.x + pos.y * pos.y);
-                        if (dist < CONFIG.reticleThreshold) {
-                            reticle.classList.add('targeted');
-                        }
-                    }
+            // Idle cookies
+            if (STATE.phase === 'THROW') {
+                cookiePool.forEach(c => {
+                    if (c.userData.isHeld) return;
+                    c.position.y += Math.sin(time * c.userData.floatSpeed + c.userData.floatPhase) * 0.002;
+                    c.rotation.y += c.userData.rotSpeed * dt;
                 });
-
-                // Only remove targeted if no cookies are near
-                const anyTarget = cookiePool.some(c => {
-                    if (c.userData.isHeld) return false;
-                    const p = c.position.clone().project(camera);
-                    return p.z < 1 && Math.sqrt(p.x*p.x + p.y*p.y) < CONFIG.reticleThreshold;
-                });
-                if (!anyTarget) reticle.classList.remove('targeted');
             }
 
-            // Milk surface shimmer
-            tumblerData.surfMat.emissiveIntensity = 0.15 + Math.sin(time * 2.8) * 0.04;
+            // Shake
+            if (shakeIntensity > 0.01) {
+                camera.position.x += (Math.random() - 0.5) * shakeIntensity;
+                camera.position.y = 1.5 + (Math.random() - 0.5) * shakeIntensity;
+                shakeIntensity *= 0.9;
+            } else if (shakeIntensity > 0) {
+                camera.position.set(0, 1.5, 0); shakeIntensity = 0;
+            }
+
+            // Milk shimmer
+            tumblerData.surfMat.emissiveIntensity = 0.12 + Math.sin(time * 2.5) * 0.03;
 
             renderer.render(scene, camera);
         }
 
-        function easeOutCubic(t) {
-            return 1 - Math.pow(1 - t, 3);
-        }
-
-        animate();
-
-        // ============================================================
-        // INITIALIZATION FLOW
-        // ============================================================
-        async function initAR() {
-            startBtn.disabled = true;
-            startBtn.textContent = 'Starting...';
-
-            statusText.textContent = 'Requesting camera...';
-            const camOk = await requestCamera();
-
-            if (camOk) {
-                statusText.textContent = 'Requesting orientation...';
-                const gyroOk = await requestOrientation();
-
-                if (gyroOk) {
-                    window.addEventListener('deviceorientation', onOrientation);
-                    STATE.gyroEnabled = true;
-                    statusText.textContent = 'Gyro active. Look around!';
-                } else {
-                    statusText.textContent = 'Gyro denied. Use touch to pan.';
-                }
-            } else {
-                statusText.textContent = 'Camera unavailable. Touch mode only.';
-            }
-
-            // Hide gate and start game
-            setTimeout(() => {
-                permissionGate.classList.add('fade-out');
-                setTimeout(() => {
-                    permissionGate.style.display = 'none';
-                    STATE.phase = 'EXPLORE';
-                    updatePhase('Explore');
-                    updateHUD();
-
-                    // Brief calibration message
-                    showMessage('Look around!', 'Find the cookies', '#ffd700');
-                }, 500);
-            }, 800);
-        }
-
-        function initTouchMode() {
-            statusText.textContent = 'Touch mode active. Drag to pan.';
-            setTimeout(() => {
-                permissionGate.classList.add('fade-out');
-                setTimeout(() => {
-                    permissionGate.style.display = 'none';
-                    STATE.phase = 'EXPLORE';
-                    updatePhase('Explore');
-                    updateHUD();
-                    showMessage('Drag to pan', 'Find the cookies', '#ffd700');
-                }, 500);
-            }, 400);
-        }
-
-        startBtn.addEventListener('click', initAR);
-        skipGyroBtn.addEventListener('click', initTouchMode);
+        if (STATE.mode !== 'WEBXR') animate();
 
         // Resize
         window.addEventListener('resize', () => {
@@ -1123,7 +1021,27 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // Prevent context menu
+        // ============================================================
+        // MODE DETECTION & ENTRY
+        // ============================================================
+        async function detectAndOfferModes() {
+            const hasWebXR = await detectWebXR();
+
+            const webxrCard = document.getElementById('webxr-card');
+            const fallbackCard = document.getElementById('fallback-card');
+
+            if (!hasWebXR) {
+                webxrCard.style.opacity = '0.4';
+                webxrCard.style.pointerEvents = 'none';
+                webxrCard.querySelector('.mode-desc').textContent += ' (Not available on this device)';
+            }
+
+            webxrCard.addEventListener('click', () => { if (hasWebXR) initWebXR(); });
+            fallbackCard.addEventListener('click', initFallback);
+        }
+
+        detectAndOfferModes();
+
         window.addEventListener('contextmenu', e => e.preventDefault());
     </script>
 </body>
